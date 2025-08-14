@@ -13,7 +13,8 @@ from typing import Any
 from mcp.server import Server
 from mcp.server.models import InitializationOptions
 from mcp.server.stdio import stdio_server
-from mcp.types import Resource, TextContent, Tool
+from mcp.types import Resource, ServerCapabilities, TextContent, Tool
+from pydantic import AnyUrl
 
 from config.project_config import Config, ConfigManager
 from docs_generator.analyzer import PythonProjectAnalyzer
@@ -101,14 +102,14 @@ class DocumentationMCPServer:
             """List available resources."""
             return [
                 Resource(
-                    uri="status",
+                    uri=AnyUrl("mcp://server/status"),
                     name="Server Status",
                     description="Current status and health information of "
                     "the MCP server",
                     mimeType="application/json",
                 ),
                 Resource(
-                    uri="capabilities",
+                    uri=AnyUrl("mcp://server/capabilities"),
                     name="Server Capabilities",
                     description="List of server capabilities and supported operations",
                     mimeType="application/json",
@@ -259,9 +260,12 @@ class DocumentationMCPServer:
                 },
             ],
             "resources": [
-                {"uri": "server://status", "description": "Server status information"},
                 {
-                    "uri": "server://capabilities",
+                    "uri": "mcp://server/status",
+                    "description": "Server status information",
+                },
+                {
+                    "uri": "mcp://server/capabilities",
                     "description": "Server capabilities listing",
                 },
             ],
@@ -289,7 +293,9 @@ async def main() -> None:
                 streams[0],
                 streams[1],
                 InitializationOptions(
-                    server_name=server.name, server_version=server.version
+                    server_name=server.name,
+                    server_version=server.version,
+                    capabilities=ServerCapabilities(),
                 ),
             )
 
