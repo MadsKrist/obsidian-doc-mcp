@@ -54,13 +54,15 @@ def validate_path(path: Path, base_path: Path | None = None) -> Path:
     if base_path:
         try:
             base_resolved = base_path.resolve()
+        except OSError as e:
+            raise PathValidationError(f"Invalid base path '{base_path}': {e}") from e
+
+        try:
             resolved_path.relative_to(base_resolved)
         except ValueError as e:
             raise PathValidationError(
                 f"Path '{resolved_path}' is outside base path '{base_resolved}'"
             ) from e
-        except OSError as e:
-            raise PathValidationError(f"Invalid base path '{base_path}': {e}") from e
 
     return resolved_path
 
