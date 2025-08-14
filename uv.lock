@@ -870,6 +870,7 @@ dependencies = [
     { name = "pyyaml" },
     { name = "rich" },
     { name = "sphinx" },
+    { name = "tomli" },
     { name = "watchdog" },
 ]
 
@@ -924,6 +925,7 @@ requires-dist = [
     { name = "rich", specifier = ">=13.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
     { name = "sphinx", specifier = ">=7.0.0" },
+    { name = "tomli", specifier = ">=2.2.1" },
     { name = "tomli", marker = "python_full_version < '3.11'", specifier = ">=2.0.0" },
     { name = "watchdog", specifier = ">=3.0.0" },
 ]
