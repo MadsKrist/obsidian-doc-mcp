@@ -10,7 +10,7 @@ Transform Python development workflows by creating seamless, automated documenta
 
 Create an MCP server that automatically generates and maintains Python project documentation in Obsidian-compatible format, enabling developers to:
 - **Never lose track of their code architecture** through automatically updated documentation
-- **Build personal knowledge graphs** that connect code concepts across projects  
+- **Build personal knowledge graphs** that connect code concepts across projects
 - **Onboard new team members instantly** with living, searchable documentation
 - **Maintain documentation without overhead** through intelligent automation
 
@@ -37,9 +37,9 @@ Create an MCP server that automatically generates and maintains Python project d
    Integration              + AST Analysis         + Vault Management
 ```
 
-#### 2. **Plugin Architecture** 
+#### 2. **Plugin Architecture**
 - **Extensible analyzers** for different Python patterns
-- **Configurable converters** for various output formats  
+- **Configurable converters** for various output formats
 - **Pluggable templates** for different documentation styles
 - **Modular integrations** for different knowledge management tools
 
@@ -167,7 +167,7 @@ Source Code → AST Analysis → Sphinx Generation → Format Conversion → Vau
 # Package management
 uv                    # Python package manager and virtual environment
 
-# Development tools  
+# Development tools
 git                   # Version control
 python 3.11+          # Runtime environment
 node.js 18+           # For any web-based tooling
@@ -251,7 +251,7 @@ repos:
   - repo: https://github.com/psf/black
     hooks:
       - id: black
-  - repo: https://github.com/astral-sh/ruff-pre-commit  
+  - repo: https://github.com/astral-sh/ruff-pre-commit
     hooks:
       - id: ruff
   - repo: https://github.com/pre-commit/mirrors-mypy
@@ -261,7 +261,7 @@ repos:
 
 #### **Testing Strategy**
 - **Unit Tests**: Individual component testing
-- **Integration Tests**: End-to-end workflow testing  
+- **Integration Tests**: End-to-end workflow testing
 - **Performance Tests**: Large project handling
 - **Compatibility Tests**: Various Python versions and platforms
 
@@ -313,7 +313,7 @@ repos:
 - **Performance**: <30s documentation generation for 10k line projects
 - **Reliability**: <1% failure rate across diverse Python projects
 
-### User Experience Metrics  
+### User Experience Metrics
 - **Time to First Success**: <5 minutes from install to generated docs
 - **User Satisfaction**: NPS >50, >4.5 stars on distribution platforms
 - **Community Engagement**: Active GitHub issues, PRs, discussions
@@ -335,7 +335,7 @@ repos:
 
 ### Version 1.x (Enhancement)
 - Multiple output formats (HTML, PDF)
-- Advanced templating system  
+- Advanced templating system
 - Performance optimizations
 - Extended Python feature support
 

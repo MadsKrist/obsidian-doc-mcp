@@ -1,0 +1,135 @@
+name: Documentation
+
+on:
+  push:
+    branches: [ main, master ]
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - 'PLANNING.md'
+      - 'CLAUDE.md'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    paths:
+      - 'docs/**'
+      - 'README.md'
+      - 'PLANNING.md'
+      - 'CLAUDE.md'
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-docs:
+    name: Build Documentation
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Install uv
+      uses: astral-sh/setup-uv@v4
+      with:
+        version: "latest"
+
+    - name: Set up Python
+      run: uv python install 3.12
+
+    - name: Install dependencies
+      run: uv sync --group docs
+
+    - name: Create docs directory if it doesn't exist
+      run: |
+        mkdir -p docs
+        if [ ! -f docs/index.md ]; then
+          echo "# Obsidian Doc MCP Documentation" > docs/index.md
+          echo "" >> docs/index.md
+          echo "Welcome to the Obsidian Doc MCP Server documentation!" >> docs/index.md
+          echo "" >> docs/index.md
+          echo "## Quick Links" >> docs/index.md
+          echo "- [README](../README.md)" >> docs/index.md
+          echo "- [Planning Document](../PLANNING.md)" >> docs/index.md
+          echo "- [Development Guide](../CLAUDE.md)" >> docs/index.md
+        fi
+
+    - name: Create mkdocs.yml if it doesn't exist
+      run: |
+        if [ ! -f mkdocs.yml ]; then
+          cat > mkdocs.yml << 'EOF'
+        site_name: Obsidian Doc MCP
+        site_description: MCP server for generating Python project documentation in Obsidian format
+        site_url: https://madskristensen.github.io/obsidian-doc-mcp/
+        repo_url: https://github.com/madskristensen/obsidian-doc-mcp
+        repo_name: madskristensen/obsidian-doc-mcp
+
+        theme:
+          name: material
+          features:
+            - navigation.tabs
+            - navigation.sections
+            - navigation.expand
+            - search.highlight
+            - search.share
+          palette:
+            - scheme: default
+              primary: deep purple
+              accent: purple
+              toggle:
+                icon: material/brightness-7
+                name: Switch to dark mode
+            - scheme: slate
+              primary: deep purple
+              accent: purple
+              toggle:
+                icon: material/brightness-4
+                name: Switch to light mode
+
+        nav:
+          - Home: index.md
+          - Getting Started: README.md
+          - Planning: PLANNING.md
+          - Development: CLAUDE.md
+
+        markdown_extensions:
+          - admonition
+          - pymdownx.details
+          - pymdownx.superfences
+          - pymdownx.tabbed:
+              alternate_style: true
+          - pymdownx.highlight:
+              anchor_linenums: true
+          - pymdownx.inlinehilite
+          - pymdownx.snippets
+          - attr_list
+          - md_in_html
+        EOF
+        fi
+
+    - name: Build documentation
+      run: uv run mkdocs build
+
+    - name: Upload Pages artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: ./site
+
+  deploy-docs:
+    name: Deploy to GitHub Pages
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    needs: build-docs
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
