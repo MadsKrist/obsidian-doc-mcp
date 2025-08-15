@@ -514,3 +514,61 @@ group_by_module = true
         if env_value is None:
             return default_value
         return [item.strip() for item in env_value.split(",") if item.strip()]
+
+    def save_config(self, config: Config, config_path: Path) -> None:
+        """Save configuration to YAML file.
+
+        Args:
+            config: Configuration object to save
+            config_path: Path to save configuration to
+
+        Raises:
+            ConfigurationError: If configuration cannot be saved
+        """
+        try:
+            # Convert config to dictionary
+            config_dict = {
+                "project": {
+                    "name": config.project.name,
+                    "version": config.project.version,
+                    "source_paths": config.project.source_paths,
+                    "exclude_patterns": config.project.exclude_patterns,
+                    "include_private": config.project.include_private,
+                },
+                "obsidian": {
+                    "vault_path": config.obsidian.vault_path,
+                    "docs_folder": config.obsidian.docs_folder,
+                    "use_wikilinks": config.obsidian.use_wikilinks,
+                    "tag_prefix": config.obsidian.tag_prefix,
+                    "template_folder": config.obsidian.template_folder,
+                },
+                "sphinx": {
+                    "extensions": config.sphinx.extensions,
+                    "theme": config.sphinx.theme,
+                },
+                "output": {
+                    "generate_index": config.output.generate_index,
+                    "cross_reference_external": config.output.cross_reference_external,
+                    "include_source_links": config.output.include_source_links,
+                    "group_by_module": config.output.group_by_module,
+                },
+            }
+
+            # Remove empty vault_path if not set
+            if not config_dict["obsidian"]["vault_path"]:
+                config_dict["obsidian"]["vault_path"] = None
+
+            # Add custom config if present
+            if config.sphinx.custom_config:
+                config_dict["sphinx"]["custom_config"] = config.sphinx.custom_config
+
+            # Write YAML file
+            with open(config_path, "w", encoding="utf-8") as f:
+                yaml.dump(config_dict, f, default_flow_style=False, indent=2)
+
+            logger.info(f"Configuration saved to {config_path}")
+
+        except Exception as e:
+            raise ConfigurationError(
+                f"Failed to save configuration to {config_path}: {e}"
+            ) from e
