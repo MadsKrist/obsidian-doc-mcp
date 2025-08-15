@@ -105,7 +105,7 @@ output:
 
         start_time = time.time()
         structure1 = analyzer_no_cache.analyze_project()
-        time.time() - start_time
+        first_duration = time.time() - start_time
 
         # Second run with cache enabled
         analyzer_with_cache = PythonProjectAnalyzer(large_project, enable_cache=True)
@@ -124,6 +124,9 @@ output:
 
         # Cache should improve performance on subsequent runs
         assert second_cache_time <= first_cache_time
+
+        # Initial run should take some time (basic sanity check)
+        assert first_duration > 0
 
         # Check that cache file was created
         cache_file = large_project / ".mcp-docs-cache.json"
