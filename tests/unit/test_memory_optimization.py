@@ -97,7 +97,7 @@ class TestMemoryMonitor:
             assert monitor.current_profile is profile
 
             # Do some work that uses memory
-            test_data = [i for i in range(1000)]
+            test_data = list(range(1000))
             monitor.take_snapshot()
             del test_data
 
@@ -175,7 +175,7 @@ class TestMemoryOptimizer:
 
         # Test with reasonable limit that shouldn't be exceeded
         with optimizer.memory_limit(1000.0):  # 1GB limit
-            test_data = [i for i in range(100)]
+            test_data = list(range(100))
             del test_data
 
         # Should complete without raising MemoryError
@@ -235,7 +235,7 @@ class TestMemoryEfficientContext:
         """Test memory-efficient context with memory limit."""
         # Use a very high limit that shouldn't be exceeded
         with memory_efficient_context(max_memory_mb=10000.0) as (monitor, optimizer):
-            test_data = [i for i in range(1000)]
+            test_data = list(range(1000))
             del test_data
 
     def test_memory_efficient_context_aggressive_gc(self):
@@ -294,7 +294,7 @@ class TestMemoryOptimizationIntegration:
         monitor = MemoryMonitor()
 
         # Create conditions that might trigger recommendations
-        snapshot = monitor.get_memory_snapshot()
+        monitor.get_memory_snapshot()
         recommendations = monitor.get_memory_recommendations()
 
         # Should return a list (may be empty depending on system state)

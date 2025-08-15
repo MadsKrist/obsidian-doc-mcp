@@ -88,7 +88,7 @@ output:
 
         start_time = time.time()
         structure1 = analyzer_no_cache.analyze_project()
-        no_cache_time = time.time() - start_time
+        time.time() - start_time
 
         # Second run with cache enabled
         analyzer_with_cache = PythonProjectAnalyzer(large_project, enable_cache=True)
@@ -188,8 +188,7 @@ output:
 
         # Check that dependencies were detected correctly
         # 'handlers' should depend on 'models' and 'api'
-        handlers_deps = dependencies.get("handlers", set())
-        expected_deps = {"models", "api"}  # Based on imports in our test data
+        dependencies.get("handlers", set())
 
         # At least some dependencies should be detected
         assert len(dependencies) > 0
@@ -242,11 +241,11 @@ output:
             # 3. Parallel processing with dependencies
             with monitor.profile_operation("parallel_processing"):
                 dependency_analyzer = ModuleDependencyAnalyzer()
-                dependencies = dependency_analyzer.analyze_module_dependencies(
+                dependency_analyzer.analyze_module_dependencies(
                     project_structure.modules
                 )
 
-                processor = ParallelProcessor(max_workers=2, use_threads=True)
+                ParallelProcessor(max_workers=2, use_threads=True)
 
                 def process_module_batch(modules_data):
                     return [f"processed_{m.name}" for m in modules_data]
@@ -284,7 +283,7 @@ output:
         assert max(complexities) > min(complexities)
 
         # Test independence detection
-        dependencies = dependency_analyzer.analyze_module_dependencies(
+        dependency_analyzer.analyze_module_dependencies(
             project_structure.modules
         )
         independent_modules = dependency_analyzer.get_independent_modules()
@@ -341,7 +340,7 @@ output:
                 aggressive_gc=True,
             ) as (monitor, optimizer):
                 # This should trigger the memory limit
-                large_data = [i for i in range(100000)]  # Create some data
+                large_data = list(range(100000))  # Create some data
                 del large_data
         except MemoryError:
             # Expected behavior - memory limit was enforced

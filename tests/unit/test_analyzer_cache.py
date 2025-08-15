@@ -160,7 +160,7 @@ def new_function() -> None:
         )
 
         # First analysis
-        structure1 = analyzer.analyze_project()
+        analyzer.analyze_project()
         assert len(analyzer._cache) == 1
 
         # Wait for cache to expire
@@ -206,7 +206,7 @@ def new_function() -> None:
         analyzer = PythonProjectAnalyzer(sample_python_file, enable_cache=True)
 
         # Analyze and verify cache
-        structure = analyzer.analyze_project()
+        analyzer.analyze_project()
         assert len(analyzer._cache) == 1
 
         cache_file = sample_python_file / ".mcp-docs-cache.json"

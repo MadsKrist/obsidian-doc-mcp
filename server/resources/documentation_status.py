@@ -229,7 +229,7 @@ class DocumentationStatusResource:
             history["updates"] = modified_files
             history["statistics"]["total_updates"] = len(modified_files)
             history["statistics"]["files_modified"] = len(
-                set(f["file"] for f in modified_files)
+                {f["file"] for f in modified_files}
             )
 
             if days > 0:
