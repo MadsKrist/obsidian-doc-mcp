@@ -112,4 +112,3 @@ temp-vault/
 
 # uv lock file (keep if using uv for development)
 # uv.lock
-tests/integration/test_performance_optimizations.py
