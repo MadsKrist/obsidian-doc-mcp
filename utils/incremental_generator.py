@@ -61,7 +61,8 @@ class IncrementalDocumentationGenerator:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
         logger.info(
-            f"Initialized incremental documentation generator (incremental: {enable_incremental})"
+            f"Initialized incremental documentation generator "
+            f"(incremental: {enable_incremental})"
         )
 
     async def generate_documentation(
@@ -82,7 +83,7 @@ class IncrementalDocumentationGenerator:
             IncrementalDocumentationGenerationError: If generation fails
         """
         try:
-            start_time = asyncio.get_event_loop().time()
+            # start_time = asyncio.get_event_loop().time()  # Not used
 
             results = {
                 "status": "success",
@@ -286,7 +287,8 @@ class IncrementalDocumentationGenerator:
 
         files_to_rebuild = changed_files | dependent_files
         logger.info(
-            f"Total files to rebuild: {len(files_to_rebuild)} (including {len(dependent_files)} dependents)"
+            f"Total files to rebuild: {len(files_to_rebuild)} "
+            f"(including {len(dependent_files)} dependents)"
         )
         results["statistics"]["files_to_rebuild"] = len(files_to_rebuild)
 
@@ -375,7 +377,8 @@ class IncrementalDocumentationGenerator:
         results["generation_summary"] = self._create_generation_summary(results)
 
         logger.info(
-            f"Incremental build completed in {results['performance']['total_time_seconds']}s"
+            f"Incremental build completed in "
+            f"{results['performance']['total_time_seconds']}s"
         )
         return results
 
@@ -464,16 +467,16 @@ class IncrementalDocumentationGenerator:
 
         if build_type == "incremental":
             return (
-                f"Incremental build completed: {stats.get('files_changed', 0)} changed files, "
-                f"{stats.get('modules_analyzed', 0)} modules rebuilt, "
+                f"Incremental build completed: {stats.get('files_changed', 0)} "
+                f"changed files, {stats.get('modules_analyzed', 0)} modules rebuilt, "
                 f"{stats.get('total_files_generated', 0)} files generated in "
                 f"{perf.get('total_time_seconds', 0)}s"
             )
         else:
             return (
-                f"Full build completed: {stats.get('modules_analyzed', 0)} modules analyzed, "
-                f"{stats.get('total_files_generated', 0)} files generated in "
-                f"{perf.get('total_time_seconds', 0)}s"
+                f"Full build completed: {stats.get('modules_analyzed', 0)} "
+                f"modules analyzed, {stats.get('total_files_generated', 0)} "
+                f"files generated in {perf.get('total_time_seconds', 0)}s"
             )
 
     def get_build_status(self) -> dict[str, Any]:

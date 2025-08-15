@@ -8,7 +8,7 @@ import asyncio
 import logging
 from collections.abc import Callable, Iterator
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from config.project_config import Config
 from docs_generator.analyzer import ModuleInfo, PythonProjectAnalyzer
@@ -30,7 +30,7 @@ class MemoryOptimizedDocumentationGenerator:
     def __init__(
         self,
         config: Config,
-        max_memory_mb: Optional[float] = None,
+        max_memory_mb: float | None = None,
         batch_size: int = 10,
         aggressive_gc: bool = True,
     ):
@@ -118,7 +118,8 @@ class MemoryOptimizedDocumentationGenerator:
         # Step 2: Process files in memory-efficient batches
         if progress_callback:
             progress_callback(
-                f"Processing {len(python_files)} files in batches of {self.batch_size}..."
+                f"Processing {len(python_files)} files in batches of "
+                f"{self.batch_size}..."
             )
 
         all_modules = []
@@ -129,7 +130,8 @@ class MemoryOptimizedDocumentationGenerator:
                 with monitor.profile_operation(batch_name):
                     if progress_callback:
                         progress_callback(
-                            f"Analyzing batch {batch_idx + 1} ({len(batch_files)} files)..."
+                            f"Analyzing batch {batch_idx + 1} "
+                            f"({len(batch_files)} files)..."
                         )
 
                     batch_modules = await self._analyze_files_batch(
@@ -332,7 +334,8 @@ class MemoryOptimizedDocumentationGenerator:
         memory = results.get("memory_profile", {})
 
         return (
-            f"Memory-optimized generation completed: {stats.get('modules_analyzed', 0)} modules, "
+            f"Memory-optimized generation completed: "
+            f"{stats.get('modules_analyzed', 0)} modules, "
             f"{stats.get('total_files_generated', 0)} files generated, "
             f"peak memory: {memory.get('peak_memory_mb', 0):.1f}MB"
         )
@@ -346,9 +349,8 @@ class MemoryOptimizedDocumentationGenerator:
             sample_files = python_files[:sample_size]
 
             with monitor.profile_operation("memory_estimation"):
-                sample_modules = await self._analyze_files_batch(
-                    sample_files, optimizer
-                )
+                # Sample modules for estimation (not used in calculations)
+                await self._analyze_files_batch(sample_files, optimizer)
 
             # Estimate based on sample
             if monitor.current_profile and sample_size > 0:

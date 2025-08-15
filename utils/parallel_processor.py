@@ -11,7 +11,7 @@ import threading
 import time
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, TypeVar
 
 logger = logging.getLogger(__name__)
 
@@ -36,11 +36,11 @@ class ProcessingResult(Generic[R]):
     """Represents the result of a processing task."""
 
     task_id: str
-    result: Optional[R] = None
-    error: Optional[Exception] = None
+    result: R | None = None
+    error: Exception | None = None
     start_time: float = 0.0
     end_time: float = 0.0
-    worker_id: Optional[str] = None
+    worker_id: str | None = None
 
     @property
     def duration(self) -> float:
@@ -112,7 +112,8 @@ class DependencyResolver:
                 completed_tasks.add(task_id)
 
         logger.info(
-            f"Resolved {len(self.tasks)} tasks into {len(execution_levels)} execution levels"
+            f"Resolved {len(self.tasks)} tasks into "
+            f"{len(execution_levels)} execution levels"
         )
         return execution_levels
 
@@ -122,7 +123,7 @@ class ParallelProcessor:
 
     def __init__(
         self,
-        max_workers: Optional[int] = None,
+        max_workers: int | None = None,
         use_threads: bool = True,
         timeout_per_task: float = 300.0,  # 5 minutes default
     ):
@@ -151,7 +152,7 @@ class ParallelProcessor:
         task_id: str,
         input_data: Any,
         processor_func: Callable[[Any], Any],
-        dependencies: Optional[set[str]] = None,
+        dependencies: set[str] | None = None,
         priority: int = 0,
         estimated_duration: float = 1.0,
     ) -> None:
@@ -177,12 +178,13 @@ class ParallelProcessor:
         self.dependency_resolver.add_task(task)
 
     def process_all(
-        self, progress_callback: Optional[Callable[[str, float], None]] = None
+        self, progress_callback: Callable[[str, float], None] | None = None
     ) -> dict[str, ProcessingResult]:
         """Process all tasks in parallel, respecting dependencies.
 
         Args:
-            progress_callback: Optional callback for progress updates (message, progress)
+            progress_callback: Optional callback for progress updates
+                               (message, progress)
 
         Returns:
             Dictionary of task results
@@ -199,7 +201,8 @@ class ParallelProcessor:
 
         for level_idx, task_ids in enumerate(execution_levels):
             logger.info(
-                f"Processing level {level_idx + 1}/{len(execution_levels)}: {len(task_ids)} tasks"
+                f"Processing level {level_idx + 1}/{len(execution_levels)}: "
+                f"{len(task_ids)} tasks"
             )
 
             if progress_callback:

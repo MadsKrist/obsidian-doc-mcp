@@ -10,7 +10,7 @@ import logging
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -126,7 +126,7 @@ class IncrementalBuildManager:
         except Exception:
             return ""
 
-    def _get_current_file_state(self, file_path: Path) -> Optional[FileState]:
+    def _get_current_file_state(self, file_path: Path) -> FileState | None:
         """Get current state of a file."""
         if not file_path.exists():
             return None
@@ -218,7 +218,7 @@ class IncrementalBuildManager:
     def mark_files_built(
         self,
         file_paths: list[Path],
-        generated_files: Optional[dict[str, list[str]]] = None,
+        generated_files: dict[str, list[str]] | None = None,
     ) -> None:
         """Mark files as built and update their state.
 

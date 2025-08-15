@@ -8,7 +8,7 @@ import asyncio
 import logging
 from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from config.project_config import Config
 from docs_generator.analyzer import ModuleInfo, ProjectStructure, PythonProjectAnalyzer
@@ -33,7 +33,7 @@ class ParallelDocumentationGenerator:
     def __init__(
         self,
         config: Config,
-        max_workers: Optional[int] = None,
+        max_workers: int | None = None,
         use_threads: bool = True,
         enable_memory_optimization: bool = True,
     ):
@@ -105,7 +105,7 @@ class ParallelDocumentationGenerator:
 
     async def _generate_with_parallelism(
         self,
-        monitor: Optional[MemoryMonitor],
+        monitor: MemoryMonitor | None,
         progress_callback: Callable[[str], None] | None = None,
     ) -> dict[str, Any]:
         """Perform parallel documentation generation."""
@@ -275,7 +275,7 @@ class ParallelDocumentationGenerator:
 
         sphinx_html_dir = sphinx_output.get("build_dir", Path("."))
         output_dir = Path(
-            f'./obsidian_output_{sphinx_output.get("project_name", "module")}'
+            f"./obsidian_output_{sphinx_output.get('project_name', 'module')}"
         )
 
         return convert_sphinx_to_obsidian(sphinx_html_dir, output_dir, self.config)
@@ -318,7 +318,7 @@ class ParallelDocumentationGenerator:
         """Collect and organize results from parallel processing."""
         all_generated_files = []
 
-        for task_id, result in processing_results.items():
+        for _task_id, result in processing_results.items():
             if result.success and result.result:
                 module_result = result.result
                 if isinstance(module_result, dict) and "vault_files" in module_result:
@@ -403,12 +403,14 @@ class ParallelDocumentationGenerator:
 
         if independent_modules / total_modules < 0.3:
             recommendations.append(
-                "High dependency coupling detected - consider refactoring to reduce inter-module dependencies"
+                "High dependency coupling detected - consider refactoring to "
+                "reduce inter-module dependencies"
             )
 
         if speedup_factor < 2.0:
             recommendations.append(
-                "Limited parallel speedup expected - consider using incremental builds instead"
+                "Limited parallel speedup expected - consider using "
+                "incremental builds instead"
             )
 
         if total_modules < 10:
@@ -418,7 +420,8 @@ class ParallelDocumentationGenerator:
 
         if speedup_factor > 5.0:
             recommendations.append(
-                "Excellent parallelization potential - parallel processing highly recommended"
+                "Excellent parallelization potential - parallel processing "
+                "highly recommended"
             )
 
         return recommendations
