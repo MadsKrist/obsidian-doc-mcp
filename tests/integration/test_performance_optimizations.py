@@ -32,23 +32,40 @@ class TestPerformanceOptimizationIntegration:
             modules = [
                 (
                     "utils",
-                    "# Utility functions\n\ndef helper():\n    '''Helper function.'''\n    return 'help'",
+                    (
+                        "# Utility functions\n\n"
+                        "def helper():\n    '''Helper function.'''\n    return 'help'"
+                    ),
                 ),
                 (
                     "core",
-                    "# Core module\nfrom . import utils\n\ndef main():\n    '''Main function.'''\n    return utils.helper()",
+                    (
+                        "# Core module\nfrom . import utils\n\n"
+                        "def main():\n    '''Main function.'''\n    return utils.helper()"
+                    ),
                 ),
                 (
                     "api",
-                    "# API module\nfrom . import core\n\nclass API:\n    '''API class.'''\n    def get(self):\n        '''Get data.'''\n        return core.main()",
+                    (
+                        "# API module\nfrom . import core\n\n"
+                        "class API:\n    '''API class.'''\n    def get(self):\n"
+                        "        '''Get data.'''\n        return core.main()"
+                    ),
                 ),
                 (
                     "models",
-                    "# Models\n\nclass User:\n    '''User model.'''\n    def __init__(self, name):\n        self.name = name",
+                    (
+                        "# Models\n\nclass User:\n    '''User model.'''\n"
+                        "    def __init__(self, name):\n        self.name = name"
+                    ),
                 ),
                 (
                     "handlers",
-                    "# Handlers\nfrom . import models\nfrom . import api\n\nclass Handler:\n    '''Request handler.'''\n    def process(self):\n        return api.API().get()",
+                    (
+                        "# Handlers\nfrom . import models\nfrom . import api\n\n"
+                        "class Handler:\n    '''Request handler.'''\n    def process(self):\n"
+                        "        return api.API().get()"
+                    ),
                 ),
             ]
 
@@ -310,7 +327,8 @@ output:
         """Test memory limits and safety features."""
         # Test with reasonable memory limit first
         with memory_efficient_context(
-            max_memory_mb=500, aggressive_gc=True  # More reasonable limit
+            max_memory_mb=500,
+            aggressive_gc=True,  # More reasonable limit
         ) as (monitor, optimizer):
             # Try to analyze the project within memory limits
             analyzer = PythonProjectAnalyzer(large_project, enable_cache=True)
