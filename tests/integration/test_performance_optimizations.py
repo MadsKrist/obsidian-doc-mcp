@@ -103,11 +103,7 @@ output:
         second_cache_time = time.time() - start_time
 
         # Verify results are equivalent
-        assert (
-            len(structure1.modules)
-            == len(structure2.modules)
-            == len(structure3.modules)
-        )
+        assert len(structure1.modules) == len(structure2.modules) == len(structure3.modules)
 
         # Cache should improve performance on subsequent runs
         assert second_cache_time <= first_cache_time
@@ -180,9 +176,7 @@ output:
 
         # Test dependency analysis
         dependency_analyzer = ModuleDependencyAnalyzer()
-        dependencies = dependency_analyzer.analyze_module_dependencies(
-            project_structure.modules
-        )
+        dependencies = dependency_analyzer.analyze_module_dependencies(project_structure.modules)
 
         assert len(dependencies) == len(project_structure.modules)
 
@@ -241,9 +235,7 @@ output:
             # 3. Parallel processing with dependencies
             with monitor.profile_operation("parallel_processing"):
                 dependency_analyzer = ModuleDependencyAnalyzer()
-                dependency_analyzer.analyze_module_dependencies(
-                    project_structure.modules
-                )
+                dependency_analyzer.analyze_module_dependencies(project_structure.modules)
 
                 ParallelProcessor(max_workers=2, use_threads=True)
 
@@ -283,9 +275,7 @@ output:
         assert max(complexities) > min(complexities)
 
         # Test independence detection
-        dependency_analyzer.analyze_module_dependencies(
-            project_structure.modules
-        )
+        dependency_analyzer.analyze_module_dependencies(project_structure.modules)
         independent_modules = dependency_analyzer.get_independent_modules()
 
         # Should have at least one independent module
