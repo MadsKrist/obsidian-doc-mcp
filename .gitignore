@@ -99,6 +99,8 @@ temp/
 # MCP Server specific
 .mcp-docs.yaml
 .mcp-server-config.json
+.mcp-docs-cache.json
+.mcp-docs-build.json
 
 # Sphinx build outputs
 _build/

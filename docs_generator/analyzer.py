@@ -6,8 +6,11 @@ source code with the AST module and extracting documentation information.
 
 import ast
 import fnmatch
+import hashlib
+import json
 import logging
-from dataclasses import dataclass, field
+import time
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
 logger = logging.getLogger(__name__)
@@ -79,6 +82,16 @@ class ProjectStructure:
     dependency_graph: dict[str, list[str]] = field(default_factory=dict)
 
 
+@dataclass
+class CacheEntry:
+    """Cache entry for parsed AST data."""
+
+    module_info: ModuleInfo
+    file_hash: str
+    timestamp: float
+    file_size: int
+
+
 class ProjectAnalysisError(Exception):
     """Exception raised when project analysis fails."""
 
@@ -88,17 +101,191 @@ class ProjectAnalysisError(Exception):
 class PythonProjectAnalyzer:
     """Analyzes Python projects to extract documentation information."""
 
-    def __init__(self, project_path: Path) -> None:
+    def __init__(
+        self, project_path: Path, enable_cache: bool = True, cache_ttl: int = 3600
+    ) -> None:
         """Initialize the analyzer.
 
         Args:
             project_path: Path to the Python project root
+            enable_cache: Whether to enable AST parsing cache
+            cache_ttl: Cache time-to-live in seconds (default: 1 hour)
         """
         self.project_path = Path(project_path)
         if not self.project_path.exists():
             raise ProjectAnalysisError(f"Project path does not exist: {project_path}")
 
-        logger.info(f"Initialized analyzer for project: {self.project_path}")
+        self.enable_cache = enable_cache
+        self.cache_ttl = cache_ttl
+        self._cache: dict[str, CacheEntry] = {}
+        self._cache_file = self.project_path / ".mcp-docs-cache.json"
+
+        if self.enable_cache:
+            self._load_cache()
+
+        logger.info(
+            f"Initialized analyzer for project: {self.project_path} (cache: {enable_cache})"
+        )
+
+    def _load_cache(self) -> None:
+        """Load AST parsing cache from disk."""
+        if not self._cache_file.exists():
+            logger.debug("No cache file found, starting with empty cache")
+            return
+
+        try:
+            with open(self._cache_file, encoding="utf-8") as f:
+                cache_data = json.load(f)
+
+            current_time = time.time()
+            for file_path_str, entry_data in cache_data.items():
+                # Check if cache entry is still valid (TTL)
+                if current_time - entry_data["timestamp"] > self.cache_ttl:
+                    continue
+
+                # Reconstruct ModuleInfo from cached data
+                module_data = entry_data["module_info"]
+
+                # Reconstruct data classes
+                functions = [
+                    FunctionInfo(**func_data)
+                    for func_data in module_data.get("functions", [])
+                ]
+                classes = []
+                for class_data in module_data.get("classes", []):
+                    methods = [
+                        FunctionInfo(**method_data)
+                        for method_data in class_data.get("methods", [])
+                    ]
+                    properties = [
+                        FunctionInfo(**prop_data)
+                        for prop_data in class_data.get("properties", [])
+                    ]
+                    class_info = ClassInfo(
+                        name=class_data["name"],
+                        docstring=class_data.get("docstring"),
+                        line_number=class_data.get("line_number", 0),
+                        is_private=class_data.get("is_private", False),
+                        base_classes=class_data.get("base_classes", []),
+                        methods=methods,
+                        properties=properties,
+                        class_variables=class_data.get("class_variables", {}),
+                        decorators=class_data.get("decorators", []),
+                    )
+                    classes.append(class_info)
+
+                module_info = ModuleInfo(
+                    name=module_data["name"],
+                    file_path=Path(module_data["file_path"]),
+                    docstring=module_data.get("docstring"),
+                    imports=module_data.get("imports", []),
+                    from_imports=module_data.get("from_imports", {}),
+                    classes=classes,
+                    functions=functions,
+                    constants=module_data.get("constants", {}),
+                    variables=module_data.get("variables", {}),
+                    is_package=module_data.get("is_package", False),
+                    package_path=module_data.get("package_path", ""),
+                )
+
+                cache_entry = CacheEntry(
+                    module_info=module_info,
+                    file_hash=entry_data["file_hash"],
+                    timestamp=entry_data["timestamp"],
+                    file_size=entry_data["file_size"],
+                )
+
+                self._cache[file_path_str] = cache_entry
+
+            logger.info(f"Loaded {len(self._cache)} entries from cache")
+
+        except Exception as e:
+            logger.warning(f"Failed to load cache: {e}")
+            self._cache = {}
+
+    def _save_cache(self) -> None:
+        """Save AST parsing cache to disk."""
+        if not self.enable_cache:
+            return
+
+        try:
+            cache_data = {}
+            for file_path_str, cache_entry in self._cache.items():
+                # Convert dataclasses to dictionaries for JSON serialization
+                module_data = {
+                    "name": cache_entry.module_info.name,
+                    "file_path": str(cache_entry.module_info.file_path),
+                    "docstring": cache_entry.module_info.docstring,
+                    "imports": cache_entry.module_info.imports,
+                    "from_imports": cache_entry.module_info.from_imports,
+                    "constants": cache_entry.module_info.constants,
+                    "variables": cache_entry.module_info.variables,
+                    "is_package": cache_entry.module_info.is_package,
+                    "package_path": cache_entry.module_info.package_path,
+                    "functions": [
+                        asdict(func) for func in cache_entry.module_info.functions
+                    ],
+                    "classes": [],
+                }
+
+                for class_info in cache_entry.module_info.classes:
+                    class_data = asdict(class_info)
+                    # Convert Path objects to strings in methods and properties
+                    for method in class_data.get("methods", []):
+                        if "file_path" in method and isinstance(
+                            method["file_path"], Path
+                        ):
+                            method["file_path"] = str(method["file_path"])
+                    for prop in class_data.get("properties", []):
+                        if "file_path" in prop and isinstance(prop["file_path"], Path):
+                            prop["file_path"] = str(prop["file_path"])
+                    module_data["classes"].append(class_data)
+
+                cache_data[file_path_str] = {
+                    "module_info": module_data,
+                    "file_hash": cache_entry.file_hash,
+                    "timestamp": cache_entry.timestamp,
+                    "file_size": cache_entry.file_size,
+                }
+
+            with open(self._cache_file, "w", encoding="utf-8") as f:
+                json.dump(cache_data, f, indent=2)
+
+            logger.debug(f"Saved {len(cache_data)} entries to cache")
+
+        except Exception as e:
+            logger.warning(f"Failed to save cache: {e}")
+
+    def _get_file_hash(self, file_path: Path) -> str:
+        """Get SHA-256 hash of file contents."""
+        try:
+            with open(file_path, "rb") as f:
+                return hashlib.sha256(f.read()).hexdigest()
+        except Exception:
+            return ""
+
+    def _is_cache_valid(self, file_path: Path, cache_entry: CacheEntry) -> bool:
+        """Check if cache entry is still valid for the given file."""
+        if not file_path.exists():
+            return False
+
+        # Check if file has been modified
+        file_stat = file_path.stat()
+        current_size = file_stat.st_size
+        current_hash = self._get_file_hash(file_path)
+
+        return (
+            cache_entry.file_size == current_size
+            and cache_entry.file_hash == current_hash
+            and time.time() - cache_entry.timestamp < self.cache_ttl
+        )
+
+    def clear_cache(self) -> None:
+        """Clear the AST parsing cache."""
+        self._cache.clear()
+        if self._cache_file.exists():
+            self._cache_file.unlink()
+        logger.info("Cache cleared")
 
     def analyze_project(
         self, exclude_patterns: list[str] | None = None
@@ -144,6 +331,10 @@ class PythonProjectAnalyzer:
             # Build enhanced dependency information
             self._build_dependency_analysis(structure)
             self._build_package_structure(structure)
+
+            # Save cache after successful analysis
+            if self.enable_cache:
+                self._save_cache()
 
             logger.info(
                 f"Analysis complete. Found {len(structure.modules)} modules, "
@@ -211,6 +402,17 @@ class PythonProjectAnalyzer:
         """
         logger.debug(f"Analyzing file: {file_path}")
 
+        # Check cache first if enabled
+        file_path_str = str(file_path)
+        if self.enable_cache and file_path_str in self._cache:
+            cache_entry = self._cache[file_path_str]
+            if self._is_cache_valid(file_path, cache_entry):
+                logger.debug(f"Using cached analysis for: {file_path}")
+                return cache_entry.module_info
+            else:
+                logger.debug(f"Cache entry expired for: {file_path}")
+                del self._cache[file_path_str]
+
         try:
             with open(file_path, encoding="utf-8") as f:
                 source_code = f.read()
@@ -255,6 +457,17 @@ class PythonProjectAnalyzer:
         # Visit AST nodes to extract information
         visitor = _ModuleVisitor(module_info)
         visitor.visit(tree)
+
+        # Cache the analysis result if caching is enabled
+        if self.enable_cache:
+            file_stat = file_path.stat()
+            cache_entry = CacheEntry(
+                module_info=module_info,
+                file_hash=self._get_file_hash(file_path),
+                timestamp=time.time(),
+                file_size=file_stat.st_size,
+            )
+            self._cache[file_path_str] = cache_entry
 
         return module_info
 
