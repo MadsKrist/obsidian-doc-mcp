@@ -30,6 +30,8 @@ dependencies = [
     "obsidiantools>=0.10.0",
     "mcp>=1.12.4",
     "tomli>=2.2.1",
+    "beautifulsoup4>=4.13.4",
+    "markdownify>=1.2.0",
 ]
 
 [project.optional-dependencies]
@@ -136,6 +138,7 @@ exclude_lines = [
 [dependency-groups]
 dev = [
     "bandit>=1.8.6",
+    "black>=25.1.0",
     "mypy>=1.17.1",
     "pre-commit>=4.3.0",
     "pyright>=1.1.403",
