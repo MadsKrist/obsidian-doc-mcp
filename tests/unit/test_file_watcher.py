@@ -388,14 +388,14 @@ class TestFileWatcher:
         # Mock asyncio components for the test
         with (
             patch("asyncio.get_event_loop") as mock_get_loop,
-            patch("asyncio.ensure_future") as mock_ensure_future,
+            patch("asyncio.create_task") as mock_create_task,
         ):
             mock_loop = Mock()
             mock_loop.is_running.return_value = True
             mock_get_loop.return_value = mock_loop
 
             watcher._handle_file_changes(changed_files)
-            mock_ensure_future.assert_called_once()
+            mock_create_task.assert_called_once()
 
     def test_get_status(self, project_path, project_config):
         """Test getting watcher status."""

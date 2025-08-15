@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Optional
 
 from watchdog.events import FileSystemEvent, FileSystemEventHandler
+from watchdog.observers import Observer
 
 if TYPE_CHECKING:
     from .incremental_build import IncrementalBuildManager
@@ -185,8 +186,6 @@ class FileWatcher:
             logger.warning("File watcher is already running")
             return
 
-        from watchdog.observers import Observer
-
         logger.info(f"Starting file watcher for {self.project_path}")
 
         self.event_handler = PythonFileEventHandler(
@@ -254,7 +253,7 @@ class FileWatcher:
                 loop = asyncio.get_event_loop()
                 if loop.is_running():
                     # Schedule coroutine on existing loop
-                    asyncio.ensure_future(self._async_incremental_update(changed_files))
+                    asyncio.create_task(self._async_incremental_update(changed_files))
                 else:
                     # No loop running, run in thread
                     threading.Thread(
