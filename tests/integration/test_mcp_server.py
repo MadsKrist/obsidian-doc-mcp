@@ -169,8 +169,8 @@ project:
         capabilities_data = json.loads(capabilities)
         assert "tools" in capabilities_data
         assert "resources" in capabilities_data
-        assert len(capabilities_data["tools"]) == 2  # analyze_project and health_check
-        assert len(capabilities_data["resources"]) == 2  # status and capabilities
+        assert len(capabilities_data["tools"]) == 7  # 5 new tools + 2 legacy
+        assert len(capabilities_data["resources"]) == 5  # 3 new resources + 2 legacy
 
 
 class TestMCPServerErrorHandling:
