@@ -12,7 +12,7 @@ from collections.abc import Generator, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 try:
     import psutil
@@ -45,7 +45,7 @@ class MemoryProfile:
     operation_name: str
     start_snapshot: MemorySnapshot
     end_snapshot: MemorySnapshot
-    peak_snapshot: Optional[MemorySnapshot] = None
+    peak_snapshot: MemorySnapshot | None = None
     snapshots: list[MemorySnapshot] = field(default_factory=list)
 
     @property
@@ -73,7 +73,7 @@ class MemoryMonitor:
         """
         self.enable_tracemalloc = enable_tracemalloc
         self.enable_profiling = enable_profiling
-        self.current_profile: Optional[MemoryProfile] = None
+        self.current_profile: MemoryProfile | None = None
 
         if self.enable_tracemalloc and not tracemalloc.is_tracing():
             tracemalloc.start()
@@ -205,7 +205,8 @@ class MemoryMonitor:
         # System-specific recommendations
         if sys.platform == "darwin" and snapshot.rss_mb > 8000:  # macOS
             recommendations.append(
-                "macOS detected with high memory usage - consider memory mapping for large files"
+                "macOS detected with high memory usage - "
+                "consider memory mapping for large files"
             )
 
         return recommendations
@@ -327,7 +328,8 @@ class MemoryOptimizer:
 
                 if final_memory > max_memory_mb:
                     raise MemoryError(
-                        f"Memory limit exceeded: {final_memory:.1f}MB > {max_memory_mb:.1f}MB"
+                        f"Memory limit exceeded: {final_memory:.1f}MB > "
+                        f"{max_memory_mb:.1f}MB"
                     )
 
     def get_large_objects(self, min_size_mb: float = 1.0) -> list[dict[str, Any]]:
@@ -396,13 +398,16 @@ class MemoryOptimizer:
         # Clear regex cache (if available)
         import re
 
-        if hasattr(re, "_cache"):
-            cache = re._cache
-            cache_size = len(cache) if hasattr(cache, "__len__") else 0
-            if hasattr(cache, "clear"):
-                cache.clear()
-            cleared["regex_cache"] = cache_size
-        else:
+        try:
+            # Access internal cache safely
+            cache = getattr(re, "_cache", None)
+            if cache is not None:
+                cache_size = len(cache) if hasattr(cache, "__len__") else 0
+                if hasattr(cache, "clear"):
+                    cache.clear()
+                cleared["regex_cache"] = cache_size
+        except (AttributeError, TypeError):
+            # Cache access failed, skip silently
             cleared["regex_cache"] = 0
 
         # Clear linecache
@@ -421,7 +426,7 @@ class MemoryOptimizer:
 
 @contextmanager
 def memory_efficient_context(
-    max_memory_mb: Optional[float] = None,
+    max_memory_mb: float | None = None,
     aggressive_gc: bool = False,
     monitor_operations: bool = True,
 ) -> Generator[tuple[MemoryMonitor, MemoryOptimizer], None, None]:
