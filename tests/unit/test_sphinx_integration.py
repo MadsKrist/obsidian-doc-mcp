@@ -125,9 +125,7 @@ class TestSphinxProject:
         assert ".. automodule:: test_module" in module_rst
         assert ":members:" in module_rst
 
-    def test_create_project_structure(
-        self, sphinx_project: SphinxProject, tmp_path: Path
-    ) -> None:
+    def test_create_project_structure(self, sphinx_project: SphinxProject, tmp_path: Path) -> None:
         """Test Sphinx project structure creation."""
         sphinx_project.create_project_structure(tmp_path)
 
@@ -153,9 +151,7 @@ class TestSphinxProject:
         assert api_dir.exists()
         assert (api_dir / "test_module.rst").exists()
 
-    def test_generate_module_rst_files(
-        self, sphinx_project: SphinxProject, tmp_path: Path
-    ) -> None:
+    def test_generate_module_rst_files(self, sphinx_project: SphinxProject, tmp_path: Path) -> None:
         """Test individual module RST file generation."""
         output_dir = tmp_path / "output"
         output_dir.mkdir()
@@ -262,22 +258,16 @@ class TestSphinxBuild:
         """Test handling of missing sphinx-build command."""
         mock_subprocess.side_effect = FileNotFoundError("sphinx-build not found")
 
-        with pytest.raises(
-            SphinxGenerationError, match="sphinx-build command not found"
-        ):
+        with pytest.raises(SphinxGenerationError, match="sphinx-build command not found"):
             sphinx_project_with_structure.build_documentation()
 
     def test_build_documentation_no_structure(self) -> None:
         """Test build failure when project structure not created."""
         config = Config()
-        structure = ProjectStructure(
-            project_name="test", root_path=Path("/test"), modules=[]
-        )
+        structure = ProjectStructure(project_name="test", root_path=Path("/test"), modules=[])
         project = SphinxProject(structure, config)
 
-        with pytest.raises(
-            SphinxGenerationError, match="Project structure not created"
-        ):
+        with pytest.raises(SphinxGenerationError, match="Project structure not created"):
             project.build_documentation()
 
 
@@ -352,9 +342,7 @@ class TestSphinxDocumentationGenerator:
         # Mock temporary directory to raise exception
         mock_temp_dir.side_effect = Exception("Temporary directory creation failed")
 
-        with pytest.raises(
-            SphinxGenerationError, match="Documentation generation failed"
-        ):
+        with pytest.raises(SphinxGenerationError, match="Documentation generation failed"):
             generator.generate_documentation(sample_structure)
 
     @patch("subprocess.run")
@@ -398,9 +386,7 @@ class TestConvenienceFunction:
     """Test the convenience function."""
 
     @patch("docs_generator.sphinx_integration.SphinxDocumentationGenerator")
-    def test_generate_sphinx_documentation(
-        self, mock_generator_class: MagicMock
-    ) -> None:
+    def test_generate_sphinx_documentation(self, mock_generator_class: MagicMock) -> None:
         """Test the convenience function."""
         # Mock generator
         mock_generator = MagicMock()
@@ -409,9 +395,7 @@ class TestConvenienceFunction:
 
         # Create test data
         config = Config()
-        structure = ProjectStructure(
-            project_name="test", root_path=Path("/test"), modules=[]
-        )
+        structure = ProjectStructure(project_name="test", root_path=Path("/test"), modules=[])
 
         result = generate_sphinx_documentation(structure, config)
 

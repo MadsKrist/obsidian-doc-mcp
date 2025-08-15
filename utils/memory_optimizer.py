@@ -126,9 +126,7 @@ class MemoryMonitor:
         return snapshot
 
     @contextmanager
-    def profile_operation(
-        self, operation_name: str
-    ) -> Generator[MemoryProfile, None, None]:
+    def profile_operation(self, operation_name: str) -> Generator[MemoryProfile, None, None]:
         """Context manager for profiling memory usage of an operation.
 
         Args:
@@ -193,9 +191,7 @@ class MemoryMonitor:
             )
 
         if snapshot.available_mb < 500:
-            recommendations.append(
-                "Low available memory - enable aggressive garbage collection"
-            )
+            recommendations.append("Low available memory - enable aggressive garbage collection")
 
         if snapshot.python_objects > 1000000:
             recommendations.append(
@@ -205,8 +201,7 @@ class MemoryMonitor:
         # System-specific recommendations
         if sys.platform == "darwin" and snapshot.rss_mb > 8000:  # macOS
             recommendations.append(
-                "macOS detected with high memory usage - "
-                "consider memory mapping for large files"
+                "macOS detected with high memory usage - consider memory mapping for large files"
             )
 
         return recommendations
@@ -257,9 +252,7 @@ class MemoryOptimizer:
                 batch_num = (i // batch_size) + 1
                 batch = items[i : i + batch_size]
 
-                logger.debug(
-                    f"Processing batch {batch_num}/{total_batches} ({len(batch)} items)"
-                )
+                logger.debug(f"Processing batch {batch_num}/{total_batches} ({len(batch)} items)")
 
                 # Force garbage collection after each batch if aggressive
                 if self.aggressive_gc:
@@ -267,9 +260,7 @@ class MemoryOptimizer:
 
                 # Check object count
                 if len(gc.get_objects()) > self.object_limit:
-                    logger.warning(
-                        f"Object count exceeded {self.object_limit}, forcing GC"
-                    )
+                    logger.warning(f"Object count exceeded {self.object_limit}, forcing GC")
                     gc.collect()
 
                 yield batch
@@ -328,8 +319,7 @@ class MemoryOptimizer:
 
                 if final_memory > max_memory_mb:
                     raise MemoryError(
-                        f"Memory limit exceeded: {final_memory:.1f}MB > "
-                        f"{max_memory_mb:.1f}MB"
+                        f"Memory limit exceeded: {final_memory:.1f}MB > {max_memory_mb:.1f}MB"
                     )
 
     def get_large_objects(self, min_size_mb: float = 1.0) -> list[dict[str, Any]]:

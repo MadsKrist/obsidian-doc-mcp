@@ -78,7 +78,7 @@ class PerformanceReport:
             if metric.duration > threshold_time:
                 bottlenecks.append(
                     f"{metric.name}: {metric.duration:.3f}s "
-                    f"({metric.duration/self.total_duration*100:.1f}% of total)"
+                    f"({metric.duration / self.total_duration * 100:.1f}% of total)"
                 )
 
         self.bottlenecks = bottlenecks
@@ -105,7 +105,8 @@ class PerformanceReport:
         cpu_intensive_ops = [m for m in self.metrics if m.cpu_percent > 80]
         if cpu_intensive_ops:
             recommendations.append(
-                f"CPU-intensive operations detected: {', '.join(m.name for m in cpu_intensive_ops)}. "
+                f"CPU-intensive operations detected: "
+                f"{', '.join(m.name for m in cpu_intensive_ops)}. "
                 "Consider optimizing algorithms or implementing parallel processing."
             )
 
@@ -279,9 +280,7 @@ class PerformanceProfiler:
         # Find the most recent metric
         recent_metric = self.metrics[-1]
         if recent_metric.name != name:
-            logger.warning(
-                f"Metric name mismatch: expected {name}, got {recent_metric.name}"
-            )
+            logger.warning(f"Metric name mismatch: expected {name}, got {recent_metric.name}")
             return
 
         # Create profiler and run
@@ -308,8 +307,7 @@ class PerformanceProfiler:
         trace_lines = []
         for stat in top_stats[:limit]:
             trace_lines.append(
-                f"{stat.traceback.format()[-1].strip()}: "
-                f"{stat.size / 1024 / 1024:.1f} MB"
+                f"{stat.traceback.format()[-1].strip()}: {stat.size / 1024 / 1024:.1f} MB"
             )
 
         return trace_lines
@@ -447,9 +445,7 @@ def analyze_project_performance(project_path: Path) -> PerformanceReport:
         python_files = list(project_path.rglob("*.py"))
         total_size = sum(f.stat().st_size for f in python_files if f.exists())
 
-        logger.info(
-            f"Analyzed project: {len(python_files)} Python files, {total_size} bytes"
-        )
+        logger.info(f"Analyzed project: {len(python_files)} Python files, {total_size} bytes")
 
     report = profiler.generate_report()
     return report

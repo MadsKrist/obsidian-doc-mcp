@@ -111,15 +111,9 @@ class TestDocumentationGenerator:
         }
 
         with (
-            patch(
-                "server.tools.generate_docs.PythonProjectAnalyzer"
-            ) as mock_analyzer_class,
-            patch(
-                "server.tools.generate_docs.SphinxDocumentationGenerator"
-            ) as mock_sphinx_class,
-            patch(
-                "server.tools.generate_docs.ObsidianConverter"
-            ) as mock_obsidian_class,
+            patch("server.tools.generate_docs.PythonProjectAnalyzer") as mock_analyzer_class,
+            patch("server.tools.generate_docs.SphinxDocumentationGenerator") as mock_sphinx_class,
+            patch("server.tools.generate_docs.ObsidianConverter") as mock_obsidian_class,
         ):
             mock_analyzer = Mock()
             mock_analyzer.analyze_project.return_value = mock_project_structure
@@ -175,15 +169,9 @@ class TestDocumentationGenerator:
         }
 
         with (
-            patch(
-                "server.tools.generate_docs.PythonProjectAnalyzer"
-            ) as mock_analyzer_class,
-            patch(
-                "server.tools.generate_docs.SphinxDocumentationGenerator"
-            ) as mock_sphinx_class,
-            patch(
-                "server.tools.generate_docs.ObsidianConverter"
-            ) as mock_obsidian_class,
+            patch("server.tools.generate_docs.PythonProjectAnalyzer") as mock_analyzer_class,
+            patch("server.tools.generate_docs.SphinxDocumentationGenerator") as mock_sphinx_class,
+            patch("server.tools.generate_docs.ObsidianConverter") as mock_obsidian_class,
         ):
             mock_analyzer = Mock()
             mock_analyzer.analyze_project.return_value = mock_project_structure
@@ -209,18 +197,14 @@ class TestDocumentationGenerator:
     @pytest.mark.asyncio
     async def test_generate_documentation_analysis_failure(self, mock_config):
         """Test documentation generation with analysis failure."""
-        with patch(
-            "server.tools.generate_docs.PythonProjectAnalyzer"
-        ) as mock_analyzer_class:
+        with patch("server.tools.generate_docs.PythonProjectAnalyzer") as mock_analyzer_class:
             mock_analyzer = Mock()
             mock_analyzer.analyze_project.side_effect = Exception("Analysis failed")
             mock_analyzer_class.return_value = mock_analyzer
 
             generator = DocumentationGenerator(mock_config)
 
-            with pytest.raises(
-                DocumentationGenerationError, match="Project analysis failed"
-            ):
+            with pytest.raises(DocumentationGenerationError, match="Project analysis failed"):
                 await generator.generate_documentation()
 
     @pytest.mark.asyncio
@@ -230,12 +214,8 @@ class TestDocumentationGenerator:
         mock_project_structure.modules = []
 
         with (
-            patch(
-                "server.tools.generate_docs.PythonProjectAnalyzer"
-            ) as mock_analyzer_class,
-            patch(
-                "server.tools.generate_docs.SphinxDocumentationGenerator"
-            ) as mock_sphinx_class,
+            patch("server.tools.generate_docs.PythonProjectAnalyzer") as mock_analyzer_class,
+            patch("server.tools.generate_docs.SphinxDocumentationGenerator") as mock_sphinx_class,
         ):
             mock_analyzer = Mock()
             mock_analyzer.analyze_project.return_value = mock_project_structure
@@ -247,9 +227,7 @@ class TestDocumentationGenerator:
 
             generator = DocumentationGenerator(mock_config)
 
-            with pytest.raises(
-                DocumentationGenerationError, match="Sphinx generation failed"
-            ):
+            with pytest.raises(DocumentationGenerationError, match="Sphinx generation failed"):
                 await generator.generate_documentation()
 
     @pytest.mark.asyncio
@@ -261,15 +239,9 @@ class TestDocumentationGenerator:
         mock_sphinx_output = {"files": [], "output_dir": "/tmp/sphinx_out"}
 
         with (
-            patch(
-                "server.tools.generate_docs.PythonProjectAnalyzer"
-            ) as mock_analyzer_class,
-            patch(
-                "server.tools.generate_docs.SphinxDocumentationGenerator"
-            ) as mock_sphinx_class,
-            patch(
-                "server.tools.generate_docs.ObsidianConverter"
-            ) as mock_obsidian_class,
+            patch("server.tools.generate_docs.PythonProjectAnalyzer") as mock_analyzer_class,
+            patch("server.tools.generate_docs.SphinxDocumentationGenerator") as mock_sphinx_class,
+            patch("server.tools.generate_docs.ObsidianConverter") as mock_obsidian_class,
         ):
             mock_analyzer = Mock()
             mock_analyzer.analyze_project.return_value = mock_project_structure
@@ -280,16 +252,12 @@ class TestDocumentationGenerator:
             mock_sphinx_class.return_value = mock_sphinx
 
             mock_obsidian = Mock()
-            mock_obsidian.convert_html_directory.side_effect = Exception(
-                "Obsidian failed"
-            )
+            mock_obsidian.convert_html_directory.side_effect = Exception("Obsidian failed")
             mock_obsidian_class.return_value = mock_obsidian
 
             generator = DocumentationGenerator(mock_config)
 
-            with pytest.raises(
-                DocumentationGenerationError, match="Obsidian conversion failed"
-            ):
+            with pytest.raises(DocumentationGenerationError, match="Obsidian conversion failed"):
                 await generator.generate_documentation()
 
     def test_create_index_content(self, mock_config):
@@ -383,12 +351,8 @@ obsidian:
         }
 
         with (
-            patch(
-                "server.tools.generate_docs.ConfigManager"
-            ) as mock_config_manager_class,
-            patch(
-                "server.tools.generate_docs.DocumentationGenerator"
-            ) as mock_generator_class,
+            patch("server.tools.generate_docs.ConfigManager") as mock_config_manager_class,
+            patch("server.tools.generate_docs.DocumentationGenerator") as mock_generator_class,
         ):
             mock_config_manager = Mock()
             mock_config = Mock()
@@ -402,9 +366,7 @@ obsidian:
                 return mock_results
 
             mock_generator = Mock()
-            mock_generator.generate_documentation = AsyncMock(
-                side_effect=mock_generate_docs
-            )
+            mock_generator.generate_documentation = AsyncMock(side_effect=mock_generate_docs)
             mock_generator_class.return_value = mock_generator
 
             result = await generate_docs_tool(str(project_path))
@@ -430,9 +392,7 @@ obsidian:
 
         with (
             patch("server.tools.generate_docs.Config") as mock_config_class,
-            patch(
-                "server.tools.generate_docs.DocumentationGenerator"
-            ) as mock_generator_class,
+            patch("server.tools.generate_docs.DocumentationGenerator") as mock_generator_class,
         ):
             mock_config = Mock()
             mock_config_class.return_value = mock_config
@@ -464,9 +424,7 @@ obsidian:
 
         with (
             patch("server.tools.generate_docs.Config") as mock_config_class,
-            patch(
-                "server.tools.generate_docs.DocumentationGenerator"
-            ) as mock_generator_class,
+            patch("server.tools.generate_docs.DocumentationGenerator") as mock_generator_class,
         ):
             mock_config = Mock()
             mock_config_class.return_value = mock_config
@@ -489,9 +447,7 @@ obsidian:
 
         with (
             patch("server.tools.generate_docs.Config") as mock_config_class,
-            patch(
-                "server.tools.generate_docs.DocumentationGenerator"
-            ) as mock_generator_class,
+            patch("server.tools.generate_docs.DocumentationGenerator") as mock_generator_class,
         ):
             mock_config = Mock()
             mock_config_class.return_value = mock_config

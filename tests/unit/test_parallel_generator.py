@@ -151,9 +151,7 @@ class TestParallelDocumentationGenerator:
         # vault_manager might still be None if ObsidianVaultManager fails
         assert hasattr(generator, "vault_manager")
 
-    def test_setup_parallel_tasks(
-        self, sample_config, temp_project_dir, sample_modules
-    ):
+    def test_setup_parallel_tasks(self, sample_config, temp_project_dir, sample_modules):
         """Test parallel task setup."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -173,9 +171,7 @@ class TestParallelDocumentationGenerator:
             # Verify tasks were added to parallel processor
             assert len(generator.parallel_processor.dependency_resolver.tasks) == 2
 
-    def test_process_single_module(
-        self, sample_config, temp_project_dir, sample_modules
-    ):
+    def test_process_single_module(self, sample_config, temp_project_dir, sample_modules):
         """Test single module processing."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -183,9 +179,7 @@ class TestParallelDocumentationGenerator:
         generator = ParallelDocumentationGenerator(config)
 
         # Mock Sphinx generation
-        with patch.object(
-            generator.sphinx_generator, "generate_documentation"
-        ) as mock_sphinx:
+        with patch.object(generator.sphinx_generator, "generate_documentation") as mock_sphinx:
             with patch.object(generator, "_convert_module_to_obsidian") as mock_convert:
                 with patch.object(generator, "_save_module_to_vault") as mock_save:
                     mock_sphinx.return_value = {
@@ -204,9 +198,7 @@ class TestParallelDocumentationGenerator:
                     assert "obsidian_files" in result
                     assert "vault_files" in result
 
-    def test_process_single_module_error(
-        self, sample_config, temp_project_dir, sample_modules
-    ):
+    def test_process_single_module_error(self, sample_config, temp_project_dir, sample_modules):
         """Test single module processing with error."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -214,9 +206,7 @@ class TestParallelDocumentationGenerator:
         generator = ParallelDocumentationGenerator(config)
 
         # Mock Sphinx generation to raise error
-        with patch.object(
-            generator.sphinx_generator, "generate_documentation"
-        ) as mock_sphinx:
+        with patch.object(generator.sphinx_generator, "generate_documentation") as mock_sphinx:
             mock_sphinx.side_effect = Exception("Sphinx error")
 
             result = generator._process_single_module(sample_modules[0])
@@ -316,9 +306,7 @@ class TestParallelDocumentationGenerator:
         assert "file2.md" in result
 
     @pytest.mark.asyncio
-    async def test_analyze_project(
-        self, sample_config, temp_project_dir, sample_project_structure
-    ):
+    async def test_analyze_project(self, sample_config, temp_project_dir, sample_project_structure):
         """Test project analysis."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -429,9 +417,7 @@ class TestParallelGeneratorPerformanceEstimation:
                         assert "recommendations" in result
 
     @pytest.mark.asyncio
-    async def test_estimate_parallel_performance_no_modules(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_estimate_parallel_performance_no_modules(self, sample_config, temp_project_dir):
         """Test performance estimation with no modules."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -463,25 +449,19 @@ class TestParallelGeneratorFullPipeline:
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
 
-        generator = ParallelDocumentationGenerator(
-            config, enable_memory_optimization=True
-        )
+        generator = ParallelDocumentationGenerator(config, enable_memory_optimization=True)
 
         # Mock memory context manager
         mock_monitor = Mock()
         mock_monitor.profile_operation.return_value.__enter__ = Mock()
         mock_monitor.profile_operation.return_value.__exit__ = Mock()
-        mock_monitor.get_memory_snapshot.return_value = Mock(
-            rss_mb=128.0, python_objects=5000
-        )
+        mock_monitor.get_memory_snapshot.return_value = Mock(rss_mb=128.0, python_objects=5000)
         mock_monitor.get_memory_recommendations.return_value = []
 
         mock_optimizer = Mock()
 
         with patch("utils.parallel_generator.memory_efficient_context") as mock_context:
-            mock_context.return_value.__enter__ = Mock(
-                return_value=(mock_monitor, mock_optimizer)
-            )
+            mock_context.return_value.__enter__ = Mock(return_value=(mock_monitor, mock_optimizer))
             mock_context.return_value.__exit__ = Mock(return_value=None)
 
             with patch.object(generator, "_generate_with_parallelism") as mock_generate:
@@ -504,9 +484,7 @@ class TestParallelGeneratorFullPipeline:
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
 
-        generator = ParallelDocumentationGenerator(
-            config, enable_memory_optimization=False
-        )
+        generator = ParallelDocumentationGenerator(config, enable_memory_optimization=False)
 
         with patch.object(generator, "_generate_with_parallelism") as mock_generate:
             mock_generate.return_value = {
@@ -521,9 +499,7 @@ class TestParallelGeneratorFullPipeline:
             assert result["generation_mode"] == "parallel"
 
     @pytest.mark.asyncio
-    async def test_generate_with_parallelism_no_modules(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_generate_with_parallelism_no_modules(self, sample_config, temp_project_dir):
         """Test parallel generation with no modules."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -554,16 +530,12 @@ class TestParallelGeneratorFullPipeline:
         generator = ParallelDocumentationGenerator(config)
 
         # Mock all major dependencies
-        with patch.object(
-            generator, "_analyze_project", return_value=sample_project_structure
-        ):
+        with patch.object(generator, "_analyze_project", return_value=sample_project_structure):
             with patch.object(
                 generator.dependency_analyzer, "analyze_module_dependencies"
             ) as mock_deps:
                 with patch.object(generator, "_setup_parallel_tasks") as mock_setup:
-                    with patch.object(
-                        generator.parallel_processor, "process_all"
-                    ) as mock_process:
+                    with patch.object(generator.parallel_processor, "process_all") as mock_process:
                         with patch.object(
                             generator.parallel_processor, "get_processing_statistics"
                         ) as mock_stats:
@@ -579,9 +551,7 @@ class TestParallelGeneratorFullPipeline:
                                 mock_stats.return_value = {"success_rate": 1.0}
                                 mock_collect.return_value = ["file1.md", "file2.md"]
 
-                                result = await generator._generate_with_parallelism(
-                                    None
-                                )
+                                result = await generator._generate_with_parallelism(None)
 
                                 assert result["status"] == "success"
                                 assert result["generation_mode"] == "parallel"
@@ -607,9 +577,7 @@ class TestParallelGeneratorErrorHandling:
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
 
-        generators = [
-            ParallelDocumentationGenerator(config, max_workers=2) for _ in range(3)
-        ]
+        generators = [ParallelDocumentationGenerator(config, max_workers=2) for _ in range(3)]
 
         for gen in generators:
             assert gen.analyzer is not None

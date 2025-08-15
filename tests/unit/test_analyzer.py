@@ -31,9 +31,7 @@ class TestPythonProjectAnalyzer:
         with pytest.raises(ProjectAnalysisError, match="Project path does not exist"):
             PythonProjectAnalyzer(invalid_path)
 
-    def test_discover_python_files(
-        self, analyzer_for_project: PythonProjectAnalyzer
-    ) -> None:
+    def test_discover_python_files(self, analyzer_for_project: PythonProjectAnalyzer) -> None:
         """Test discovery of Python files in project."""
         files = analyzer_for_project._discover_python_files([])
 
@@ -66,9 +64,7 @@ class TestPythonProjectAnalyzer:
 
         # Check that classes were found
         assert len(module_info.classes) >= 1
-        sample_class = next(
-            cls for cls in module_info.classes if cls.name == "SampleClass"
-        )
+        sample_class = next(cls for cls in module_info.classes if cls.name == "SampleClass")
         assert sample_class.docstring is not None
         assert "A sample class for testing" in sample_class.docstring
 
@@ -87,9 +83,7 @@ class TestPythonProjectAnalyzer:
         with pytest.raises(ProjectAnalysisError, match="Syntax error"):
             analyzer._analyze_file(bad_file)
 
-    def test_analyze_project_success(
-        self, analyzer_for_project: PythonProjectAnalyzer
-    ) -> None:
+    def test_analyze_project_success(self, analyzer_for_project: PythonProjectAnalyzer) -> None:
         """Test successful project analysis."""
         structure = analyzer_for_project.analyze_project()
 
@@ -101,9 +95,7 @@ class TestPythonProjectAnalyzer:
         module_names = [mod.name for mod in structure.modules]
         # Check for the expected module names in the enhanced format
         has_main = any("main" in name for name in module_names)
-        has_package = any(
-            "sample_package" in name and "main" not in name for name in module_names
-        )
+        has_package = any("sample_package" in name and "main" not in name for name in module_names)
         assert has_main or has_package
 
     def test_analyze_project_with_exclusions(
@@ -126,9 +118,7 @@ class TestModuleVisitor:
         module_info = analyzer._analyze_file(sample_python_file)
 
         # Find the sample_function
-        sample_func = next(
-            func for func in module_info.functions if func.name == "sample_function"
-        )
+        sample_func = next(func for func in module_info.functions if func.name == "sample_function")
 
         assert isinstance(sample_func, FunctionInfo)
         assert not sample_func.is_async
@@ -144,9 +134,7 @@ class TestModuleVisitor:
 
         # Find the async_sample_function
         async_func = next(
-            func
-            for func in module_info.functions
-            if func.name == "async_sample_function"
+            func for func in module_info.functions if func.name == "async_sample_function"
         )
 
         assert isinstance(async_func, FunctionInfo)
@@ -161,14 +149,9 @@ class TestModuleVisitor:
         module_info = analyzer._analyze_file(sample_python_file)
 
         # Find the SampleClass
-        sample_class = next(
-            cls for cls in module_info.classes if cls.name == "SampleClass"
-        )
+        sample_class = next(cls for cls in module_info.classes if cls.name == "SampleClass")
 
-        assert (
-            sample_class.docstring
-            and "A sample class for testing" in sample_class.docstring
-        )
+        assert sample_class.docstring and "A sample class for testing" in sample_class.docstring
         assert len(sample_class.methods) >= 2  # __init__ and public_method
 
         # Check method extraction
@@ -188,9 +171,7 @@ class TestModuleVisitor:
 class TestUtilityFunctions:
     """Tests for utility functions."""
 
-    def test_analyze_python_project_function(
-        self, sample_project_structure: Path
-    ) -> None:
+    def test_analyze_python_project_function(self, sample_project_structure: Path) -> None:
         """Test the analyze_python_project utility function."""
         structure = analyze_python_project(sample_project_structure)
 

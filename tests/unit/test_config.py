@@ -119,9 +119,7 @@ class TestConfigManager:
         manager = ConfigManager()
 
         # Mock the _load_config_file method since we don't have YAML parsing yet
-        with patch.object(
-            manager, "_load_config_file", return_value=Config()
-        ) as mock_load:
+        with patch.object(manager, "_load_config_file", return_value=Config()) as mock_load:
             config = manager.load_config(config_path=config_file)
             mock_load.assert_called_once_with(config_file)
             assert isinstance(config, Config)
@@ -142,9 +140,7 @@ class TestConfigManager:
 
         manager = ConfigManager()
 
-        with patch.object(
-            manager, "_load_config_file", return_value=Config()
-        ) as mock_load:
+        with patch.object(manager, "_load_config_file", return_value=Config()) as mock_load:
             config = manager.load_config(project_path=temp_dir)
             mock_load.assert_called_once_with(config_file)
             assert isinstance(config, Config)
@@ -184,9 +180,7 @@ class TestConfigManager:
 
         manager = ConfigManager()
 
-        with pytest.raises(
-            ConfigurationError, match="At least one source path must be specified"
-        ):
+        with pytest.raises(ConfigurationError, match="At least one source path must be specified"):
             manager._validate_config(config)
 
     def test_validate_config_invalid_vault_path(self, temp_dir: Path) -> None:
@@ -234,9 +228,7 @@ class TestConfigManager:
 
         manager = ConfigManager()
 
-        with pytest.raises(
-            ConfigurationError, match="Configuration file already exists"
-        ):
+        with pytest.raises(ConfigurationError, match="Configuration file already exists"):
             manager.create_default_config_file(temp_dir, "yaml")
 
     def test_create_default_config_invalid_format(self, temp_dir: Path) -> None:
@@ -253,7 +245,5 @@ class TestConfigManager:
 
         manager = ConfigManager()
 
-        with pytest.raises(
-            ConfigurationError, match="Unsupported configuration format"
-        ):
+        with pytest.raises(ConfigurationError, match="Unsupported configuration format"):
             manager.load_config(config_path=config_file)

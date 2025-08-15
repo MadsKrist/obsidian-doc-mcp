@@ -54,15 +54,12 @@ class IncrementalDocumentationGenerator:
         # Initialize vault manager if configured
         if config.obsidian.vault_path:
             try:
-                self.vault_manager = ObsidianVaultManager(
-                    Path(config.obsidian.vault_path)
-                )
+                self.vault_manager = ObsidianVaultManager(Path(config.obsidian.vault_path))
             except Exception as e:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
         logger.info(
-            f"Initialized incremental documentation generator "
-            f"(incremental: {enable_incremental})"
+            f"Initialized incremental documentation generator (incremental: {enable_incremental})"
         )
 
     async def generate_documentation(
@@ -209,9 +206,7 @@ class IncrementalDocumentationGenerator:
         end_time = asyncio.get_event_loop().time()
         results["performance"] = {
             "total_time_seconds": round(end_time - start_time, 2),
-            "modules_per_second": round(
-                len(project_structure.modules) / (end_time - start_time), 2
-            )
+            "modules_per_second": round(len(project_structure.modules) / (end_time - start_time), 2)
             if end_time > start_time
             else 0,
         }
@@ -219,9 +214,7 @@ class IncrementalDocumentationGenerator:
         results["statistics"]["total_files_generated"] = len(results["files_generated"])
         results["generation_summary"] = self._create_generation_summary(results)
 
-        logger.info(
-            f"Full build completed in {results['performance']['total_time_seconds']}s"
-        )
+        logger.info(f"Full build completed in {results['performance']['total_time_seconds']}s")
         return results
 
     async def _perform_incremental_build(
@@ -281,9 +274,7 @@ class IncrementalDocumentationGenerator:
         dependent_files = set()
         for changed_file in changed_files:
             if self.build_manager:
-                dependent_files.update(
-                    self.build_manager.get_dependent_files(changed_file)
-                )
+                dependent_files.update(self.build_manager.get_dependent_files(changed_file))
 
         files_to_rebuild = changed_files | dependent_files
         logger.info(
@@ -317,9 +308,7 @@ class IncrementalDocumentationGenerator:
 
         # Step 5: Generate Sphinx documentation for changed modules only
         if progress_callback:
-            progress_callback(
-                f"Generating Sphinx docs for {len(modules_to_rebuild)} modules..."
-            )
+            progress_callback(f"Generating Sphinx docs for {len(modules_to_rebuild)} modules...")
 
         # Create a partial project structure for changed modules
         partial_structure = self._create_partial_project_structure(modules_to_rebuild)
@@ -353,32 +342,25 @@ class IncrementalDocumentationGenerator:
 
         # Step 9: Update build state
         if self.build_manager:
-            generated_files = {
-                str(f): results["files_generated"] for f in files_to_rebuild
-            }
+            generated_files = {str(f): results["files_generated"] for f in files_to_rebuild}
             self.build_manager.mark_files_built(list(files_to_rebuild), generated_files)
 
         # Performance metrics
         end_time = asyncio.get_event_loop().time()
         results["performance"] = {
             "total_time_seconds": round(end_time - start_time, 2),
-            "modules_per_second": round(
-                len(modules_to_rebuild) / (end_time - start_time), 2
-            )
+            "modules_per_second": round(len(modules_to_rebuild) / (end_time - start_time), 2)
             if end_time > start_time
             else 0,
             "time_saved_vs_full": "estimated 60-80% time saving",
         }
 
         results["statistics"]["total_files_generated"] = len(results["files_generated"])
-        results["files_skipped"] = [
-            str(f) for f in all_python_files if f not in files_to_rebuild
-        ]
+        results["files_skipped"] = [str(f) for f in all_python_files if f not in files_to_rebuild]
         results["generation_summary"] = self._create_generation_summary(results)
 
         logger.info(
-            f"Incremental build completed in "
-            f"{results['performance']['total_time_seconds']}s"
+            f"Incremental build completed in {results['performance']['total_time_seconds']}s"
         )
         return results
 

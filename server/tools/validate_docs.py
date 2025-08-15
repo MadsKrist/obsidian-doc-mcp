@@ -42,9 +42,7 @@ class DocumentationValidator:
         # Initialize vault manager if vault path is configured
         if config.obsidian.vault_path:
             try:
-                self.vault_manager = ObsidianVaultManager(
-                    Path(config.obsidian.vault_path)
-                )
+                self.vault_manager = ObsidianVaultManager(Path(config.obsidian.vault_path))
             except Exception as e:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
@@ -124,9 +122,7 @@ class DocumentationValidator:
 
         except Exception as e:
             logger.error(f"Documentation validation failed: {e}")
-            raise DocumentationValidationError(
-                f"Failed to validate documentation: {e}"
-            ) from e
+            raise DocumentationValidationError(f"Failed to validate documentation: {e}") from e
 
     async def _analyze_project(self):
         """Analyze the Python project structure."""
@@ -230,9 +226,7 @@ class DocumentationValidator:
         for item_type in completeness["coverage_by_type"]:
             type_data = completeness["coverage_by_type"][item_type]
             if type_data["total"] > 0:
-                type_data["coverage"] = (
-                    type_data["documented"] / type_data["total"] * 100
-                )
+                type_data["coverage"] = type_data["documented"] / type_data["total"] * 100
 
         # Calculate overall completeness score
         completeness["total_items"] = total_items
@@ -270,9 +264,7 @@ class DocumentationValidator:
         }
 
         try:
-            docs_folder = (
-                Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
-            )
+            docs_folder = Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
             if not docs_folder.exists():
                 quality["issues"].append(
                     {
@@ -313,9 +305,7 @@ class DocumentationValidator:
 
         return quality
 
-    async def _validate_file_quality(
-        self, file_path: Path, quality: dict[str, Any]
-    ) -> None:
+    async def _validate_file_quality(self, file_path: Path, quality: dict[str, Any]) -> None:
         """Validate the quality of a single documentation file.
 
         Args:
@@ -345,9 +335,7 @@ class DocumentationValidator:
 
             # Check 2: Content - has meaningful content beyond just headings
             quality["checks"]["content"]["total"] += 1
-            content_without_headings = re.sub(
-                r"^#+.*$", "", content, flags=re.MULTILINE
-            )
+            content_without_headings = re.sub(r"^#+.*$", "", content, flags=re.MULTILINE)
             content_text = content_without_headings.strip()
             if len(content_text) > 50:  # Arbitrary threshold for meaningful content
                 quality["checks"]["content"]["passed"] += 1
@@ -382,7 +370,9 @@ class DocumentationValidator:
                     {
                         "type": "formatting",
                         "severity": "low",
-                        "message": f"Formatting issues in {relative_path}: {', '.join(formatting_issues)}",
+                        "message": (
+                            f"Formatting issues in {relative_path}: {', '.join(formatting_issues)}"
+                        ),
                         "file": str(relative_path),
                         "category": "formatting",
                     }
@@ -444,9 +434,7 @@ class DocumentationValidator:
         }
 
         try:
-            docs_folder = (
-                Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
-            )
+            docs_folder = Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
             if not docs_folder.exists():
                 return links
 
@@ -580,9 +568,7 @@ class DocumentationValidator:
 
         # Completeness score (40% weight)
         if "completeness" in results and "score" in results["completeness"]:
-            scores.append(
-                results["completeness"]["score"] / 10.0
-            )  # Convert to 0-10 scale
+            scores.append(results["completeness"]["score"] / 10.0)  # Convert to 0-10 scale
             weights.append(0.4)
 
         # Quality score (35% weight)
@@ -597,7 +583,9 @@ class DocumentationValidator:
 
         # Calculate weighted average
         if scores and weights:
-            weighted_sum = sum(score * weight for score, weight in zip(scores, weights, strict=False))
+            weighted_sum = sum(
+                score * weight for score, weight in zip(scores, weights, strict=False)
+            )
             total_weight = sum(weights)
             return weighted_sum / total_weight * 10.0
         else:

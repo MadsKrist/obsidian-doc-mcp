@@ -148,18 +148,15 @@ class PythonProjectAnalyzer:
 
                 # Reconstruct data classes
                 functions = [
-                    FunctionInfo(**func_data)
-                    for func_data in module_data.get("functions", [])
+                    FunctionInfo(**func_data) for func_data in module_data.get("functions", [])
                 ]
                 classes = []
                 for class_data in module_data.get("classes", []):
                     methods = [
-                        FunctionInfo(**method_data)
-                        for method_data in class_data.get("methods", [])
+                        FunctionInfo(**method_data) for method_data in class_data.get("methods", [])
                     ]
                     properties = [
-                        FunctionInfo(**prop_data)
-                        for prop_data in class_data.get("properties", [])
+                        FunctionInfo(**prop_data) for prop_data in class_data.get("properties", [])
                     ]
                     class_info = ClassInfo(
                         name=class_data["name"],
@@ -222,9 +219,7 @@ class PythonProjectAnalyzer:
                     "variables": cache_entry.module_info.variables,
                     "is_package": cache_entry.module_info.is_package,
                     "package_path": cache_entry.module_info.package_path,
-                    "functions": [
-                        asdict(func) for func in cache_entry.module_info.functions
-                    ],
+                    "functions": [asdict(func) for func in cache_entry.module_info.functions],
                     "classes": [],
                 }
 
@@ -232,9 +227,7 @@ class PythonProjectAnalyzer:
                     class_data = asdict(class_info)
                     # Convert Path objects to strings in methods and properties
                     for method in class_data.get("methods", []):
-                        if "file_path" in method and isinstance(
-                            method["file_path"], Path
-                        ):
+                        if "file_path" in method and isinstance(method["file_path"], Path):
                             method["file_path"] = str(method["file_path"])
                     for prop in class_data.get("properties", []):
                         if "file_path" in prop and isinstance(prop["file_path"], Path):
@@ -287,9 +280,7 @@ class PythonProjectAnalyzer:
             self._cache_file.unlink()
         logger.info("Cache cleared")
 
-    def analyze_project(
-        self, exclude_patterns: list[str] | None = None
-    ) -> ProjectStructure:
+    def analyze_project(self, exclude_patterns: list[str] | None = None) -> ProjectStructure:
         """Analyze the entire Python project.
 
         Args:
@@ -315,9 +306,7 @@ class PythonProjectAnalyzer:
             logger.info(f"Found {len(python_files)} Python files to analyze")
 
             project_name = self.project_path.name
-            structure = ProjectStructure(
-                project_name=project_name, root_path=self.project_path
-            )
+            structure = ProjectStructure(project_name=project_name, root_path=self.project_path)
 
             for file_path in python_files:
                 try:
@@ -481,8 +470,7 @@ class PythonProjectAnalyzer:
             for import_name in module.imports:
                 # Check if it's an internal dependency
                 if import_name in internal_modules or any(
-                    import_name.startswith(f"{internal}.")
-                    for internal in internal_modules
+                    import_name.startswith(f"{internal}.") for internal in internal_modules
                 ):
                     structure.internal_dependencies.add(import_name)
                     module_deps.append(import_name)

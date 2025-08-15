@@ -37,9 +37,7 @@ class ObsidianConverter:
         self._link_mapping: dict[str, str] = {}
         self._file_mapping: dict[str, str] = {}
 
-    def convert_html_directory(
-        self, html_dir: Path, output_dir: Path
-    ) -> dict[str, Any]:
+    def convert_html_directory(self, html_dir: Path, output_dir: Path) -> dict[str, Any]:
         """Convert a directory of HTML files to Obsidian markdown.
 
         Args:
@@ -72,9 +70,7 @@ class ObsidianConverter:
                         continue
 
                     markdown_content = self._convert_html_file(html_file)
-                    output_file = self._get_output_file_path(
-                        html_file, html_dir, output_dir
-                    )
+                    output_file = self._get_output_file_path(html_file, html_dir, output_dir)
 
                     # Add Obsidian metadata
                     final_content = self._add_obsidian_metadata(
@@ -122,9 +118,7 @@ class ObsidianConverter:
             logger.exception("Failed to convert HTML directory")
             raise ObsidianConversionError(f"Directory conversion failed: {e}") from e
 
-    def _build_file_mapping(
-        self, html_files: list[Path], html_dir: Path, output_dir: Path
-    ) -> None:
+    def _build_file_mapping(self, html_files: list[Path], html_dir: Path, output_dir: Path) -> None:
         """Build mapping of HTML files to markdown filenames.
 
         Args:
@@ -172,9 +166,7 @@ class ObsidianConverter:
         path_str = str(relative_path)
         return any(pattern in path_str for pattern in skip_patterns)
 
-    def _get_output_file_path(
-        self, html_file: Path, html_dir: Path, output_dir: Path
-    ) -> Path:
+    def _get_output_file_path(self, html_file: Path, html_dir: Path, output_dir: Path) -> Path:
         """Get the output markdown file path for an HTML file.
 
         Args:
@@ -414,9 +406,7 @@ class ObsidianConverter:
         # Convert dashes to spaces
         return anchor.replace("-", " ")
 
-    def _add_obsidian_metadata(
-        self, content: str, html_file: Path, relative_path: Path
-    ) -> str:
+    def _add_obsidian_metadata(self, content: str, html_file: Path, relative_path: Path) -> str:
         """Add Obsidian metadata (frontmatter) to markdown content.
 
         Args:
@@ -497,9 +487,7 @@ class ObsidianConverter:
             Index file content
         """
         content = f"# {self.config.project.name} Documentation\n\n"
-        content += (
-            "This documentation was automatically generated from Python source code.\n\n"
-        )
+        content += "This documentation was automatically generated from Python source code.\n\n"
 
         # Group files by directory
         files_by_dir: dict[str, list[dict[str, Any]]] = {}
@@ -537,9 +525,7 @@ class ObsidianConverter:
         return content
 
 
-def convert_sphinx_to_obsidian(
-    html_dir: Path, output_dir: Path, config: Config
-) -> dict[str, Any]:
+def convert_sphinx_to_obsidian(html_dir: Path, output_dir: Path, config: Config) -> dict[str, Any]:
     """Convenience function to convert Sphinx HTML to Obsidian markdown.
 
     Args:

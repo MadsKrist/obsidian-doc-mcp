@@ -213,9 +213,7 @@ class TestFileWatcher:
         assert watcher.is_watching is False
         assert watcher.update_callbacks == []
 
-    def test_initialization_with_incremental_builder(
-        self, project_path, project_config
-    ):
+    def test_initialization_with_incremental_builder(self, project_path, project_config):
         """Test watcher initialization with incremental builder."""
         mock_builder = Mock()
         watcher = FileWatcher(project_path, project_config, mock_builder)
@@ -253,9 +251,7 @@ class TestFileWatcher:
         assert len(watcher.update_callbacks) == 0
 
     @patch("utils.file_watcher.Observer")
-    def test_start_watching_source_paths(
-        self, mock_observer_class, project_path, project_config
-    ):
+    def test_start_watching_source_paths(self, mock_observer_class, project_path, project_config):
         """Test starting file watching with specific source paths."""
         mock_observer = Mock()
         mock_observer_class.return_value = mock_observer
@@ -306,9 +302,7 @@ class TestFileWatcher:
 
         with patch("utils.file_watcher.logger") as mock_logger:
             watcher.start_watching()
-            mock_logger.warning.assert_called_once_with(
-                "File watcher is already running"
-            )
+            mock_logger.warning.assert_called_once_with("File watcher is already running")
 
         # Should not create new observer
         mock_observer_class.assert_not_called()
@@ -382,9 +376,7 @@ class TestFileWatcher:
         success_callback.assert_called_once_with(changed_files)
 
     @pytest.mark.asyncio
-    async def test_handle_file_changes_with_incremental_builder(
-        self, project_path, project_config
-    ):
+    async def test_handle_file_changes_with_incremental_builder(self, project_path, project_config):
         """Test handling file changes with incremental builder."""
         mock_builder = Mock()
         mock_builder.get_changed_files = Mock(return_value=set())
@@ -394,9 +386,10 @@ class TestFileWatcher:
         changed_files = {project_path / "src" / "module.py"}
 
         # Mock asyncio components for the test
-        with patch("asyncio.get_event_loop") as mock_get_loop, patch(
-            "asyncio.ensure_future"
-        ) as mock_ensure_future:
+        with (
+            patch("asyncio.get_event_loop") as mock_get_loop,
+            patch("asyncio.ensure_future") as mock_ensure_future,
+        ):
             mock_loop = Mock()
             mock_loop.is_running.return_value = True
             mock_get_loop.return_value = mock_loop
@@ -438,13 +431,9 @@ class TestCreateFileWatcher:
     """Test cases for create_file_watcher function."""
 
     @pytest.mark.asyncio
-    async def test_create_file_watcher_with_incremental_updates(
-        self, project_path, project_config
-    ):
+    async def test_create_file_watcher_with_incremental_updates(self, project_path, project_config):
         """Test creating file watcher with incremental updates enabled."""
-        with patch(
-            "utils.incremental_build.IncrementalBuildManager"
-        ) as mock_builder_class:
+        with patch("utils.incremental_build.IncrementalBuildManager") as mock_builder_class:
             mock_builder = Mock()
             mock_builder_class.return_value = mock_builder
 
@@ -470,13 +459,9 @@ class TestCreateFileWatcher:
         assert len(watcher.update_callbacks) == 1  # Log callback added
 
     @pytest.mark.asyncio
-    async def test_create_file_watcher_builder_error(
-        self, project_path, project_config
-    ):
+    async def test_create_file_watcher_builder_error(self, project_path, project_config):
         """Test creating file watcher when incremental builder creation fails."""
-        with patch(
-            "utils.incremental_build.IncrementalBuildManager"
-        ) as mock_builder_class:
+        with patch("utils.incremental_build.IncrementalBuildManager") as mock_builder_class:
             mock_builder_class.side_effect = Exception("Builder error")
 
             with patch("utils.file_watcher.logger") as mock_logger:

@@ -109,9 +109,7 @@ class TestDetailedError:
             stack_trace="Stack trace here",
         )
 
-        suggestion = ErrorSuggestion(
-            "Fix it", "How to fix", "fix", command="fix_command"
-        )
+        suggestion = ErrorSuggestion("Fix it", "How to fix", "fix", command="fix_command")
         error.add_suggestion(suggestion)
 
         result = error.to_dict()
@@ -176,9 +174,7 @@ class TestErrorReporter:
     def test_match_error_pattern_file_not_found(self):
         """Test matching FileNotFoundError pattern."""
         reporter = ErrorReporter()
-        exception = FileNotFoundError(
-            "[Errno 2] No such file or directory: '/test/file.py'"
-        )
+        exception = FileNotFoundError("[Errno 2] No such file or directory: '/test/file.py'")
 
         error = reporter.report_error(exception)
 
@@ -251,9 +247,7 @@ class TestErrorReporter:
         reporter._generate_suggestions(error)
 
         # Should have suggestions from file system handlers
-        assert (
-            len(error.suggestions) >= 0
-        )  # May or may not have suggestions depending on error_id
+        assert len(error.suggestions) >= 0  # May or may not have suggestions depending on error_id
 
     def test_file_system_suggestions(self):
         """Test file system error suggestions."""
@@ -631,9 +625,7 @@ class TestErrorPatternMatching:
         def failing_suggestion_handler(_):
             raise RuntimeError("Suggestion handler failed")
 
-        reporter.suggestion_handlers[ErrorCategory.VALIDATION] = [
-            failing_suggestion_handler
-        ]
+        reporter.suggestion_handlers[ErrorCategory.VALIDATION] = [failing_suggestion_handler]
 
         exception = ValueError("Test error")
 

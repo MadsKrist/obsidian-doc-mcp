@@ -161,10 +161,7 @@ class TestObsidianConverter:
         assert converter._convert_sphinx_anchor("module.Class.method") == "method"
 
         # Test complex anchor
-        assert (
-            converter._convert_sphinx_anchor("my-module.MyClass.my-method")
-            == "my method"
-        )
+        assert converter._convert_sphinx_anchor("my-module.MyClass.my-method") == "my method"
 
     def test_convert_links_with_anchors(self, converter: ObsidianConverter) -> None:
         """Test conversion of links with anchors to wikilinks."""
@@ -174,7 +171,8 @@ class TestObsidianConverter:
         }
 
         markdown_with_anchors = """
-        Link to [method](module.html#module.Class.method) and [simple anchor](module.html#simple-section).
+        Link to [method](module.html#module.Class.method) and
+        [simple anchor](module.html#simple-section).
         """
 
         result = converter._convert_links_to_wikilinks(markdown_with_anchors)
@@ -182,9 +180,7 @@ class TestObsidianConverter:
         assert "[[module#method|method]]" in result
         assert "[[module#simple section|simple anchor]]" in result
 
-    def test_convert_html_file_basic(
-        self, converter: ObsidianConverter, tmp_path: Path
-    ) -> None:
+    def test_convert_html_file_basic(self, converter: ObsidianConverter, tmp_path: Path) -> None:
         """Test basic HTML file conversion."""
         # Create test HTML file
         html_content = """
@@ -218,14 +214,10 @@ class TestObsidianConverter:
         """Test HTML file conversion error handling."""
         mock_file.side_effect = OSError("File not found")
 
-        with pytest.raises(
-            ObsidianConversionError, match="Failed to convert HTML file"
-        ):
+        with pytest.raises(ObsidianConversionError, match="Failed to convert HTML file"):
             converter._convert_html_file(Path("nonexistent.html"))
 
-    def test_add_obsidian_metadata(
-        self, converter: ObsidianConverter, tmp_path: Path
-    ) -> None:
+    def test_add_obsidian_metadata(self, converter: ObsidianConverter, tmp_path: Path) -> None:
         """Test Obsidian metadata addition."""
         content = "# Test Content\n\nSome content here."
         html_file = tmp_path / "test.html"
@@ -314,9 +306,7 @@ class TestObsidianConverter:
         """Test HTML directory conversion with errors."""
         mock_ensure_dir.side_effect = Exception("Directory creation failed")
 
-        with pytest.raises(
-            ObsidianConversionError, match="Directory conversion failed"
-        ):
+        with pytest.raises(ObsidianConversionError, match="Directory conversion failed"):
             converter.convert_html_directory(tmp_path / "html", tmp_path / "output")
 
     def test_clean_html_for_conversion(self, converter: ObsidianConverter) -> None:
@@ -404,6 +394,4 @@ class TestConvenienceFunction:
 
         assert result["success"] is True
         mock_converter_class.assert_called_once_with(config)
-        mock_converter.convert_html_directory.assert_called_once_with(
-            html_dir, output_dir
-        )
+        mock_converter.convert_html_directory.assert_called_once_with(html_dir, output_dir)

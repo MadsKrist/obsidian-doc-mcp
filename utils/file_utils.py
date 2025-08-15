@@ -110,14 +110,10 @@ def ensure_directory(directory: Path) -> None:
         directory.mkdir(parents=True, exist_ok=True)
         logger.debug(f"Directory ensured: {directory}")
     except OSError as e:
-        raise FileOperationError(
-            f"Failed to create directory '{directory}': {e}"
-        ) from e
+        raise FileOperationError(f"Failed to create directory '{directory}': {e}") from e
 
 
-def copy_file_safely(
-    source: Path, destination: Path, create_backup: bool = True
-) -> None:
+def copy_file_safely(source: Path, destination: Path, create_backup: bool = True) -> None:
     """Copy a file safely with optional backup creation.
 
     Args:
@@ -150,9 +146,7 @@ def copy_file_safely(
         raise FileOperationError(f"Failed to copy file: {e}") from e
 
 
-def move_file_safely(
-    source: Path, destination: Path, create_backup: bool = True
-) -> None:
+def move_file_safely(source: Path, destination: Path, create_backup: bool = True) -> None:
     """Move a file safely with optional backup creation.
 
     Args:
@@ -290,9 +284,7 @@ def create_backup_file(file_path: Path) -> Path:
         # Ensure unique backup filename
         counter = 1
         while backup_path.exists():
-            backup_path = file_path.with_suffix(
-                f".backup.{timestamp}.{counter}{file_path.suffix}"
-            )
+            backup_path = file_path.with_suffix(f".backup.{timestamp}.{counter}{file_path.suffix}")
             counter += 1
 
         # Copy the file to backup location
@@ -337,9 +329,7 @@ def calculate_file_hash(file_path: Path, algorithm: str = "sha256") -> str:
         raise FileOperationError(f"Failed to calculate file hash: {e}") from e
 
 
-def verify_file_integrity(
-    file_path: Path, expected_hash: str, algorithm: str = "sha256"
-) -> bool:
+def verify_file_integrity(file_path: Path, expected_hash: str, algorithm: str = "sha256") -> bool:
     """Verify file integrity using hash comparison.
 
     Args:
@@ -386,9 +376,7 @@ def temporary_directory(prefix: str = "mcp_docs_") -> Generator[Path, None, None
                 shutil.rmtree(temp_dir)
                 logger.debug(f"Cleaned up temporary directory: {temp_dir}")
             except Exception as e:
-                logger.warning(
-                    f"Failed to clean up temporary directory {temp_dir}: {e}"
-                )
+                logger.warning(f"Failed to clean up temporary directory {temp_dir}: {e}")
 
 
 @contextmanager

@@ -84,17 +84,13 @@ class ProjectStructureResource:
             self._cached_structure = structure_data
             self._cache_timestamp = datetime.now()
 
-            logger.info(
-                f"Project structure cached: {len(structure_data['modules'])} modules"
-            )
+            logger.info(f"Project structure cached: {len(structure_data['modules'])} modules")
 
             return self._apply_filters(structure_data, include_private, filter_patterns)
 
         except Exception as e:
             logger.error(f"Failed to get project structure: {e}")
-            raise ProjectStructureError(
-                f"Failed to analyze project structure: {e}"
-            ) from e
+            raise ProjectStructureError(f"Failed to analyze project structure: {e}") from e
 
     async def search_structure(
         self,
@@ -137,9 +133,7 @@ class ProjectStructureResource:
             # Search modules
             if search_type in ["all", "modules"]:
                 for module in structure["modules"]:
-                    module_name = (
-                        module["name"] if case_sensitive else module["name"].lower()
-                    )
+                    module_name = module["name"] if case_sensitive else module["name"].lower()
                     if query_lower in module_name or self._search_in_text(
                         module.get("docstring", ""), query, case_sensitive
                     ):
@@ -150,9 +144,7 @@ class ProjectStructureResource:
                                 "docstring": module.get("docstring", "")[:200] + "..."
                                 if len(module.get("docstring", "")) > 200
                                 else module.get("docstring", ""),
-                                "match_type": "name"
-                                if query_lower in module_name
-                                else "docstring",
+                                "match_type": "name" if query_lower in module_name else "docstring",
                             }
                         )
 
@@ -161,9 +153,7 @@ class ProjectStructureResource:
                 for module in structure["modules"]:
                     for class_info in module["classes"]:
                         class_name = (
-                            class_info["name"]
-                            if case_sensitive
-                            else class_info["name"].lower()
+                            class_info["name"] if case_sensitive else class_info["name"].lower()
                         )
                         if query_lower in class_name or self._search_in_text(
                             class_info.get("docstring", ""), query, case_sensitive
@@ -174,8 +164,7 @@ class ProjectStructureResource:
                                     "module": module["name"],
                                     "file_path": module["file_path"],
                                     "line_number": class_info["line_number"],
-                                    "docstring": class_info.get("docstring", "")[:200]
-                                    + "..."
+                                    "docstring": class_info.get("docstring", "")[:200] + "..."
                                     if len(class_info.get("docstring", "")) > 200
                                     else class_info.get("docstring", ""),
                                     "match_type": "name"
@@ -189,9 +178,7 @@ class ProjectStructureResource:
                 for module in structure["modules"]:
                     for func_info in module["functions"]:
                         func_name = (
-                            func_info["name"]
-                            if case_sensitive
-                            else func_info["name"].lower()
+                            func_info["name"] if case_sensitive else func_info["name"].lower()
                         )
                         if query_lower in func_name or self._search_in_text(
                             func_info.get("docstring", ""), query, case_sensitive
@@ -203,8 +190,7 @@ class ProjectStructureResource:
                                     "file_path": module["file_path"],
                                     "line_number": func_info["line_number"],
                                     "signature": func_info.get("signature", ""),
-                                    "docstring": func_info.get("docstring", "")[:200]
-                                    + "..."
+                                    "docstring": func_info.get("docstring", "")[:200] + "..."
                                     if len(func_info.get("docstring", "")) > 200
                                     else func_info.get("docstring", ""),
                                     "match_type": "name"
@@ -218,16 +204,12 @@ class ProjectStructureResource:
                 len(results) for results in search_results["results"].values()
             )
 
-            logger.info(
-                f"Search for '{query}' found {search_results['total_matches']} matches"
-            )
+            logger.info(f"Search for '{query}' found {search_results['total_matches']} matches")
             return search_results
 
         except Exception as e:
             logger.error(f"Failed to search project structure: {e}")
-            raise ProjectStructureError(
-                f"Failed to search project structure: {e}"
-            ) from e
+            raise ProjectStructureError(f"Failed to search project structure: {e}") from e
 
     async def get_file_info(self, file_path: str) -> dict[str, Any]:
         """Get detailed information about a specific file.
@@ -262,9 +244,7 @@ class ProjectStructureResource:
                 "docstring": module_info.docstring,
                 "line_count": self._count_lines(full_path),
                 "size_bytes": full_path.stat().st_size,
-                "last_modified": datetime.fromtimestamp(
-                    full_path.stat().st_mtime
-                ).isoformat(),
+                "last_modified": datetime.fromtimestamp(full_path.stat().st_mtime).isoformat(),
                 "classes": [],
                 "functions": [],
                 "imports": module_info.imports,
@@ -321,9 +301,7 @@ class ProjectStructureResource:
 
         except Exception as e:
             logger.error(f"Failed to get file info for {file_path}: {e}")
-            raise ProjectStructureError(
-                f"Failed to analyze file {file_path}: {e}"
-            ) from e
+            raise ProjectStructureError(f"Failed to analyze file {file_path}: {e}") from e
 
     async def get_changes(self, since: str | None = None) -> dict[str, Any]:
         """Get project structure changes since a specific timestamp.
@@ -382,9 +360,7 @@ class ProjectStructureResource:
                 # No since timestamp - return current state summary
                 structure = await self.get_structure()
                 changes["summary"]["modules_changed"] = len(structure["modules"])
-                changes["summary"]["total_changes"] = changes["summary"][
-                    "modules_changed"
-                ]
+                changes["summary"]["total_changes"] = changes["summary"]["modules_changed"]
 
             return changes
 
@@ -523,17 +499,13 @@ class ProjectStructureResource:
                     cls for cls in module["classes"] if not cls.get("is_private", False)
                 ]
                 module["functions"] = [
-                    func
-                    for func in module["functions"]
-                    if not func.get("is_private", False)
+                    func for func in module["functions"] if not func.get("is_private", False)
                 ]
 
                 # Filter private methods from classes
                 for cls in module["classes"]:
                     cls["methods"] = [
-                        method
-                        for method in cls["methods"]
-                        if not method.get("is_private", False)
+                        method for method in cls["methods"] if not method.get("is_private", False)
                     ]
 
         return filtered

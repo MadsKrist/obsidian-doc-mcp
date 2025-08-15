@@ -34,18 +34,14 @@ class BuildState:
     last_full_build: float = 0.0
     files: dict[str, FileState] = field(default_factory=dict)
     dependencies: dict[str, list[str]] = field(default_factory=dict)
-    outputs: dict[str, list[str]] = field(
-        default_factory=dict
-    )  # source -> generated files
+    outputs: dict[str, list[str]] = field(default_factory=dict)  # source -> generated files
     build_version: str = "1.0"
 
 
 class IncrementalBuildManager:
     """Manages incremental documentation builds."""
 
-    def __init__(
-        self, project_path: Path, build_cache_file: str = ".mcp-docs-build.json"
-    ):
+    def __init__(self, project_path: Path, build_cache_file: str = ".mcp-docs-build.json"):
         """Initialize the incremental build manager.
 
         Args:
@@ -81,9 +77,7 @@ class IncrementalBuildManager:
                 outputs=data.get("outputs", {}),
             )
 
-            logger.info(
-                f"Loaded build state with {len(self.build_state.files)} tracked files"
-            )
+            logger.info(f"Loaded build state with {len(self.build_state.files)} tracked files")
 
         except Exception as e:
             logger.warning(f"Failed to load build state: {e}")
@@ -191,9 +185,7 @@ class IncrementalBuildManager:
             if not Path(tracked_path).exists():
                 changed_files.add(Path(tracked_path))
 
-        logger.info(
-            f"Found {len(changed_files)} changed files out of {len(file_paths)} total"
-        )
+        logger.info(f"Found {len(changed_files)} changed files out of {len(file_paths)} total")
         return changed_files
 
     def get_dependent_files(self, changed_file: Path) -> set[Path]:
@@ -312,9 +304,7 @@ class IncrementalBuildManager:
                             output_path.unlink()
                             cleaned_files.append(output_file)
                         except Exception as e:
-                            logger.warning(
-                                f"Failed to clean output file {output_file}: {e}"
-                            )
+                            logger.warning(f"Failed to clean output file {output_file}: {e}")
 
                 sources_to_remove.append(source_file)
 
@@ -340,8 +330,7 @@ class IncrementalBuildManager:
             "project_path": self.build_state.project_path,
             "tracked_files": len(self.build_state.files),
             "last_full_build": self.build_state.last_full_build,
-            "hours_since_full_build": (current_time - self.build_state.last_full_build)
-            / 3600
+            "hours_since_full_build": (current_time - self.build_state.last_full_build) / 3600
             if self.build_state.last_full_build > 0
             else float("inf"),
             "dependency_mappings": len(self.build_state.dependencies),

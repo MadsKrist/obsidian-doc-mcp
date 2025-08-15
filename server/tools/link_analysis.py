@@ -38,9 +38,7 @@ class LinkAnalyzer:
         # Initialize vault manager if vault path is configured
         if config.obsidian.vault_path:
             try:
-                self.vault_manager = ObsidianVaultManager(
-                    Path(config.obsidian.vault_path)
-                )
+                self.vault_manager = ObsidianVaultManager(Path(config.obsidian.vault_path))
             except Exception as e:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
@@ -133,9 +131,7 @@ class LinkAnalyzer:
         }
 
         try:
-            docs_folder = (
-                Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
-            )
+            docs_folder = Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
             if not docs_folder.exists():
                 return graph
 
@@ -343,9 +339,7 @@ class LinkAnalyzer:
 
         return stats
 
-    async def _find_dead_links(
-        self, link_graph: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    async def _find_dead_links(self, link_graph: dict[str, Any]) -> list[dict[str, Any]]:
         """Find all dead/broken links in the documentation.
 
         Args:
@@ -373,9 +367,7 @@ class LinkAnalyzer:
 
         return dead_links
 
-    def _suggest_link_fix(
-        self, broken_edge: dict[str, Any], link_graph: dict[str, Any]
-    ) -> str:
+    def _suggest_link_fix(self, broken_edge: dict[str, Any], link_graph: dict[str, Any]) -> str:
         """Suggest a fix for a broken link.
 
         Args:
@@ -406,9 +398,7 @@ class LinkAnalyzer:
         else:
             return f"Create missing file: {target}.md"
 
-    async def _find_orphaned_files(
-        self, link_graph: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    async def _find_orphaned_files(self, link_graph: dict[str, Any]) -> list[dict[str, Any]]:
         """Find files that have no inbound links (orphaned).
 
         Args:
@@ -436,9 +426,7 @@ class LinkAnalyzer:
 
         return orphaned
 
-    def _suggest_orphan_fix(
-        self, orphan_node: dict[str, Any], link_graph: dict[str, Any]
-    ) -> str:
+    def _suggest_orphan_fix(self, orphan_node: dict[str, Any], link_graph: dict[str, Any]) -> str:
         """Suggest how to fix an orphaned file.
 
         Args:
@@ -453,9 +441,7 @@ class LinkAnalyzer:
         else:
             return "Consider linking this file from index or removing if unused"
 
-    async def _identify_clusters(
-        self, link_graph: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    async def _identify_clusters(self, link_graph: dict[str, Any]) -> list[dict[str, Any]]:
         """Identify clusters of strongly connected files.
 
         Args:
@@ -478,9 +464,7 @@ class LinkAnalyzer:
         cluster_id = 0
 
         for node_name in link_graph["nodes"]:
-            if node_name not in visited and link_graph["nodes"][node_name].get(
-                "exists", True
-            ):
+            if node_name not in visited and link_graph["nodes"][node_name].get("exists", True):
                 cluster = self._bfs_cluster(node_name, adjacency, visited)
                 if len(cluster) > 1:  # Only include clusters with multiple files
                     cluster_nodes = [link_graph["nodes"][name] for name in cluster]
@@ -492,12 +476,8 @@ class LinkAnalyzer:
                             "size": len(cluster),
                             "files": list(cluster),
                             "total_words": total_words,
-                            "internal_links": self._count_internal_links(
-                                cluster, link_graph
-                            ),
-                            "external_links": self._count_external_links(
-                                cluster, link_graph
-                            ),
+                            "internal_links": self._count_internal_links(cluster, link_graph),
+                            "external_links": self._count_external_links(cluster, link_graph),
                         }
                     )
                     cluster_id += 1
@@ -506,9 +486,7 @@ class LinkAnalyzer:
         clusters.sort(key=lambda x: x["size"], reverse=True)
         return clusters
 
-    def _bfs_cluster(
-        self, start_node: str, adjacency: dict[str, set], visited: set
-    ) -> set[str]:
+    def _bfs_cluster(self, start_node: str, adjacency: dict[str, set], visited: set) -> set[str]:
         """Find connected component using BFS.
 
         Args:
@@ -534,9 +512,7 @@ class LinkAnalyzer:
 
         return cluster
 
-    def _count_internal_links(
-        self, cluster: set[str], link_graph: dict[str, Any]
-    ) -> int:
+    def _count_internal_links(self, cluster: set[str], link_graph: dict[str, Any]) -> int:
         """Count links within a cluster.
 
         Args:
@@ -552,9 +528,7 @@ class LinkAnalyzer:
                 count += 1
         return count
 
-    def _count_external_links(
-        self, cluster: set[str], link_graph: dict[str, Any]
-    ) -> int:
+    def _count_external_links(self, cluster: set[str], link_graph: dict[str, Any]) -> int:
         """Count links from cluster to external files.
 
         Args:
@@ -570,9 +544,7 @@ class LinkAnalyzer:
                 count += 1
         return count
 
-    async def _generate_visualization_data(
-        self, link_graph: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _generate_visualization_data(self, link_graph: dict[str, Any]) -> dict[str, Any]:
         """Generate data for link graph visualization.
 
         Args:
@@ -594,9 +566,7 @@ class LinkAnalyzer:
                     {
                         "id": node_name,
                         "label": node_name,
-                        "size": max(
-                            5, min(50, node_data["word_count"] // 50)
-                        ),  # Scale size
+                        "size": max(5, min(50, node_data["word_count"] // 50)),  # Scale size
                         "inbound": node_data["inbound_links"],
                         "outbound": node_data["outbound_links"],
                         "group": self._determine_node_group(node_data),
@@ -617,9 +587,7 @@ class LinkAnalyzer:
 
         # Layout suggestions
         viz_data["layout_suggestions"] = {
-            "recommended_layout": "force_directed"
-            if len(viz_data["nodes"]) > 20
-            else "circular",
+            "recommended_layout": "force_directed" if len(viz_data["nodes"]) > 20 else "circular",
             "clustering_enabled": len(viz_data["nodes"]) > 10,
             "highlight_hubs": True,
         }
@@ -663,13 +631,10 @@ class LinkAnalyzer:
         if dead_links:
             high_priority = [link for link in dead_links if link["severity"] == "high"]
             if high_priority:
-                recommendations.append(
-                    f"Fix {len(high_priority)} high-priority broken wikilinks"
-                )
+                recommendations.append(f"Fix {len(high_priority)} high-priority broken wikilinks")
             if len(dead_links) > len(high_priority):
                 recommendations.append(
-                    f"Review and fix {len(dead_links) - len(high_priority)} "
-                    "additional broken links"
+                    f"Review and fix {len(dead_links) - len(high_priority)} additional broken links"
                 )
 
         # Orphaned file recommendations
@@ -711,16 +676,14 @@ class LinkAnalyzer:
             validity_ratio = validity.get("valid", 0) / total_links
             if validity_ratio < 0.9:
                 recommendations.append(
-                    f"Link validity is {validity_ratio:.1%} - "
-                    "focus on fixing broken references"
+                    f"Link validity is {validity_ratio:.1%} - focus on fixing broken references"
                 )
 
         # Hub file recommendations
         hub_files = stats.get("hub_files", [])
         if hub_files and hub_files[0]["inbound_links"] > 10:
             recommendations.append(
-                f"'{hub_files[0]['name']}' is a major hub - "
-                "ensure it has comprehensive content"
+                f"'{hub_files[0]['name']}' is a major hub - ensure it has comprehensive content"
             )
 
         return recommendations
@@ -775,7 +738,9 @@ async def link_analysis_tool(
 # Tool metadata for MCP registration
 TOOL_DEFINITION = {
     "name": "link_analysis",
-    "description": "Analyze cross-references, detect dead links, and optimize documentation connectivity",
+    "description": (
+        "Analyze cross-references, detect dead links, and optimize documentation connectivity"
+    ),
     "inputSchema": {
         "type": "object",
         "properties": {

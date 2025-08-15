@@ -119,9 +119,7 @@ class TestObsidianVaultManager:
         file_path.write_text("original content")
 
         content = "# New Content"
-        result_path, backup_path = manager.safe_write_file(
-            file_path, content, create_backup=False
-        )
+        result_path, backup_path = manager.safe_write_file(file_path, content, create_backup=False)
 
         assert result_path == file_path
         assert backup_path is None
@@ -247,9 +245,7 @@ class TestVaultValidation:
     def test_validate_vault_structure_valid(self, temp_obsidian_vault):
         """Test validating a valid vault structure."""
         # Create app.json
-        (temp_obsidian_vault / ".obsidian" / "app.json").write_text(
-            '{"theme": "obsidian"}'
-        )
+        (temp_obsidian_vault / ".obsidian" / "app.json").write_text('{"theme": "obsidian"}')
 
         issues = validate_vault_structure(temp_obsidian_vault)
         assert len(issues) == 0
@@ -288,9 +284,7 @@ class TestFrontmatterCreation:
         tags = ["python", "documentation"]
 
         with patch("utils.obsidian_utils.datetime") as mock_datetime:
-            mock_datetime.now.return_value.isoformat.return_value = (
-                "2024-01-01T12:00:00"
-            )
+            mock_datetime.now.return_value.isoformat.return_value = "2024-01-01T12:00:00"
             frontmatter = create_obsidian_frontmatter(title, tags)
 
         assert "---" in frontmatter
@@ -306,9 +300,7 @@ class TestFrontmatterCreation:
         source_file = "src/module.py"
 
         with patch("utils.obsidian_utils.datetime") as mock_datetime:
-            mock_datetime.now.return_value.isoformat.return_value = (
-                "2024-01-01T12:00:00"
-            )
+            mock_datetime.now.return_value.isoformat.return_value = "2024-01-01T12:00:00"
             frontmatter = create_obsidian_frontmatter(title, tags, source_file)
 
         assert "source: src/module.py" in frontmatter

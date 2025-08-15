@@ -24,9 +24,7 @@ logger = logging.getLogger(__name__)
 class PythonFileEventHandler(FileSystemEventHandler):
     """Event handler for Python file changes."""
 
-    def __init__(
-        self, callback: Callable[[set[Path]], None], project_path: Path, config: Config
-    ):
+    def __init__(self, callback: Callable[[set[Path]], None], project_path: Path, config: Config):
         """Initialize the event handler.
 
         Args:
@@ -206,16 +204,12 @@ class FileWatcher:
                 if watch_path.exists():
                     logger.debug(f"Watching directory: {watch_path}")
                     if self.observer and self.event_handler:
-                        self.observer.schedule(
-                            self.event_handler, str(watch_path), recursive=True
-                        )
+                        self.observer.schedule(self.event_handler, str(watch_path), recursive=True)
         else:
             # Watch entire project directory
             logger.debug(f"Watching entire project: {self.project_path}")
             if self.observer and self.event_handler:
-                self.observer.schedule(
-                    self.event_handler, str(self.project_path), recursive=True
-                )
+                self.observer.schedule(self.event_handler, str(self.project_path), recursive=True)
 
         if self.observer:
             self.observer.start()
@@ -293,14 +287,10 @@ class FileWatcher:
             if self.incremental_builder:
                 # Get files that actually changed according to build manager
                 changed_list = list(changed_files)
-                actual_changed = self.incremental_builder.get_changed_files(
-                    changed_list
-                )
+                actual_changed = self.incremental_builder.get_changed_files(changed_list)
 
                 if actual_changed:
-                    logger.info(
-                        f"Incremental update detected {len(actual_changed)} changed files"
-                    )
+                    logger.info(f"Incremental update detected {len(actual_changed)} changed files")
                     # Mark files as needing rebuild
                     for file_path in actual_changed:
                         # The build manager will handle the actual rebuild logic
@@ -338,10 +328,7 @@ class FileWatcher:
             "is_watching": self.is_watching,
             "project_path": str(self.project_path),
             "watched_paths": (
-                [
-                    str(self.project_path / path)
-                    for path in self.config.project.source_paths
-                ]
+                [str(self.project_path / path) for path in self.config.project.source_paths]
                 if self.config.project.source_paths
                 else [str(self.project_path)]
             ),

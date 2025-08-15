@@ -193,9 +193,7 @@ class TestMemoryOptimizer:
         try:
             # Read file in chunks
             read_content = ""
-            for chunk in optimizer.memory_efficient_file_reader(
-                temp_path, chunk_size=50
-            ):
+            for chunk in optimizer.memory_efficient_file_reader(temp_path, chunk_size=50):
                 read_content += chunk
 
             assert read_content == test_content

@@ -100,9 +100,7 @@ class ErrorReporter:
     def __init__(self):
         """Initialize the error reporter."""
         self.errors: list[DetailedError] = []
-        self.error_patterns: dict[
-            str, Callable[[Exception, dict[str, Any]], DetailedError]
-        ] = {}
+        self.error_patterns: dict[str, Callable[[Exception, dict[str, Any]], DetailedError]] = {}
         self.suggestion_handlers: dict[
             ErrorCategory, list[Callable[[DetailedError], list[ErrorSuggestion]]]
         ] = {}
@@ -149,9 +147,7 @@ class ErrorReporter:
         # Store the error
         self.errors.append(detailed_error)
 
-        logger.error(
-            f"Error reported: {detailed_error.title} ({detailed_error.error_id})"
-        )
+        logger.error(f"Error reported: {detailed_error.title} ({detailed_error.error_id})")
         return detailed_error
 
     def _match_error_pattern(
@@ -177,9 +173,7 @@ class ErrorReporter:
         category: ErrorCategory | None,
     ) -> DetailedError:
         """Create a generic error when no specific pattern matches."""
-        error_id = (
-            f"generic_{type(exception).__name__}_{hash(str(exception)) % 10000:04d}"
-        )
+        error_id = f"generic_{type(exception).__name__}_{hash(str(exception)) % 10000:04d}"
 
         # Try to infer category from context or exception type
         if not category:
@@ -195,9 +189,7 @@ class ErrorReporter:
             context=context,
         )
 
-    def _infer_category(
-        self, exception: Exception, context: dict[str, Any]
-    ) -> ErrorCategory:
+    def _infer_category(self, exception: Exception, context: dict[str, Any]) -> ErrorCategory:
         """Infer error category from exception and context."""
         exception_str = str(exception).lower()
 
@@ -218,10 +210,7 @@ class ErrorReporter:
             return ErrorCategory.SPHINX_BUILD
 
         # Obsidian-related errors
-        if (
-            "obsidian" in exception_str
-            or context.get("operation") == "obsidian_conversion"
-        ):
+        if "obsidian" in exception_str or context.get("operation") == "obsidian_conversion":
             return ErrorCategory.OBSIDIAN_CONVERSION
 
         # Default to validation
@@ -243,15 +232,11 @@ class ErrorReporter:
         """Register built-in error patterns."""
 
         # File not found errors
-        self.error_patterns[
-            "[Errno 2] No such file or directory"
-        ] = self._handle_file_not_found
+        self.error_patterns["[Errno 2] No such file or directory"] = self._handle_file_not_found
         self.error_patterns["FileNotFoundError"] = self._handle_file_not_found
 
         # Permission errors
-        self.error_patterns[
-            "[Errno 13] Permission denied"
-        ] = self._handle_permission_denied
+        self.error_patterns["[Errno 13] Permission denied"] = self._handle_permission_denied
         self.error_patterns["PermissionError"] = self._handle_permission_denied
 
         # Import errors
@@ -272,24 +257,12 @@ class ErrorReporter:
 
     def _register_builtin_suggestions(self) -> None:
         """Register built-in suggestion handlers."""
-        self.suggestion_handlers[ErrorCategory.FILE_SYSTEM] = [
-            self._suggest_file_system_fixes
-        ]
-        self.suggestion_handlers[ErrorCategory.DEPENDENCY] = [
-            self._suggest_dependency_fixes
-        ]
-        self.suggestion_handlers[ErrorCategory.CONFIGURATION] = [
-            self._suggest_config_fixes
-        ]
-        self.suggestion_handlers[ErrorCategory.SPHINX_BUILD] = [
-            self._suggest_sphinx_fixes
-        ]
-        self.suggestion_handlers[ErrorCategory.OBSIDIAN_CONVERSION] = [
-            self._suggest_obsidian_fixes
-        ]
-        self.suggestion_handlers[ErrorCategory.PERFORMANCE] = [
-            self._suggest_performance_fixes
-        ]
+        self.suggestion_handlers[ErrorCategory.FILE_SYSTEM] = [self._suggest_file_system_fixes]
+        self.suggestion_handlers[ErrorCategory.DEPENDENCY] = [self._suggest_dependency_fixes]
+        self.suggestion_handlers[ErrorCategory.CONFIGURATION] = [self._suggest_config_fixes]
+        self.suggestion_handlers[ErrorCategory.SPHINX_BUILD] = [self._suggest_sphinx_fixes]
+        self.suggestion_handlers[ErrorCategory.OBSIDIAN_CONVERSION] = [self._suggest_obsidian_fixes]
+        self.suggestion_handlers[ErrorCategory.PERFORMANCE] = [self._suggest_performance_fixes]
 
     # Error pattern handlers
 
@@ -325,9 +298,7 @@ class ErrorReporter:
         self, exception: Exception, context: dict[str, Any]
     ) -> DetailedError:
         """Handle module not found errors."""
-        module_name = (
-            str(exception).split("'")[1] if "'" in str(exception) else "unknown"
-        )
+        module_name = str(exception).split("'")[1] if "'" in str(exception) else "unknown"
 
         return DetailedError(
             error_id="module_not_found",
@@ -339,9 +310,7 @@ class ErrorReporter:
             context={**context, "missing_module": module_name},
         )
 
-    def _handle_import_error(
-        self, exception: Exception, context: dict[str, Any]
-    ) -> DetailedError:
+    def _handle_import_error(self, exception: Exception, context: dict[str, Any]) -> DetailedError:
         """Handle import errors."""
         return DetailedError(
             error_id="import_error",
@@ -353,9 +322,7 @@ class ErrorReporter:
             context=context,
         )
 
-    def _handle_sphinx_error(
-        self, exception: Exception, context: dict[str, Any]
-    ) -> DetailedError:
+    def _handle_sphinx_error(self, exception: Exception, context: dict[str, Any]) -> DetailedError:
         """Handle Sphinx build errors."""
         return DetailedError(
             error_id="sphinx_build_error",
@@ -367,9 +334,7 @@ class ErrorReporter:
             context=context,
         )
 
-    def _handle_config_error(
-        self, exception: Exception, context: dict[str, Any]
-    ) -> DetailedError:
+    def _handle_config_error(self, exception: Exception, context: dict[str, Any]) -> DetailedError:
         """Handle configuration errors."""
         return DetailedError(
             error_id="configuration_error",
@@ -381,9 +346,7 @@ class ErrorReporter:
             context=context,
         )
 
-    def _handle_memory_error(
-        self, exception: Exception, context: dict[str, Any]
-    ) -> DetailedError:
+    def _handle_memory_error(self, exception: Exception, context: dict[str, Any]) -> DetailedError:
         """Handle memory errors."""
         return DetailedError(
             error_id="memory_error",
@@ -395,9 +358,7 @@ class ErrorReporter:
             context=context,
         )
 
-    def _handle_timeout_error(
-        self, exception: Exception, context: dict[str, Any]
-    ) -> DetailedError:
+    def _handle_timeout_error(self, exception: Exception, context: dict[str, Any]) -> DetailedError:
         """Handle timeout errors."""
         return DetailedError(
             error_id="timeout_error",
@@ -445,7 +406,9 @@ class ErrorReporter:
                 [
                     ErrorSuggestion(
                         title="Check File Permissions",
-                        description="Verify you have read/write permissions for the file or directory",
+                        description=(
+                            "Verify you have read/write permissions for the file or directory"
+                        ),
                         action_type="investigate",
                         command="ls -la <file_path>",
                         priority=1,
@@ -699,9 +662,7 @@ def report_error(
     affected_files: list[Path] | None = None,
 ) -> DetailedError:
     """Convenience function to report an error using the global reporter."""
-    return get_global_reporter().report_error(
-        exception, context, category, affected_files
-    )
+    return get_global_reporter().report_error(exception, context, category, affected_files)
 
 
 def create_error_context(operation: str, **kwargs) -> dict[str, Any]:

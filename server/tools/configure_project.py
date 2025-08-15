@@ -164,9 +164,7 @@ class ProjectConfigurator:
 
         # Find Python files
         python_files = list(self.project_path.rglob("*.py"))
-        analysis["python_files"] = [
-            str(f.relative_to(self.project_path)) for f in python_files
-        ]
+        analysis["python_files"] = [str(f.relative_to(self.project_path)) for f in python_files]
 
         # Identify potential source directories
         common_source_dirs = ["src", "lib", "app", self.project_path.name]
@@ -209,9 +207,7 @@ class ProjectConfigurator:
 
         # Check for existing documentation
         doc_patterns = ["docs/", "doc/", "README.md", "*.rst"]
-        analysis["has_docs"] = any(
-            self.project_path.glob(pattern) for pattern in doc_patterns
-        )
+        analysis["has_docs"] = any(self.project_path.glob(pattern) for pattern in doc_patterns)
 
         # Estimate project size
         if len(python_files) > 100:
@@ -231,9 +227,7 @@ class ProjectConfigurator:
 
         return analysis
 
-    async def _load_or_create_config(
-        self, template_name: str | None = None
-    ) -> tuple[Config, Path]:
+    async def _load_or_create_config(self, template_name: str | None = None) -> tuple[Config, Path]:
         """Load existing configuration or create new one.
 
         Args:
@@ -353,9 +347,7 @@ class ProjectConfigurator:
 
         return config
 
-    async def _apply_config_data(
-        self, config: Config, config_data: dict[str, Any]
-    ) -> Config:
+    async def _apply_config_data(self, config: Config, config_data: dict[str, Any]) -> Config:
         """Apply user-provided configuration data.
 
         Args:
@@ -392,13 +384,9 @@ class ProjectConfigurator:
             return config
 
         except Exception as e:
-            raise ProjectConfigurationError(
-                f"Failed to apply configuration data: {e}"
-            ) from e
+            raise ProjectConfigurationError(f"Failed to apply configuration data: {e}") from e
 
-    async def _auto_configure(
-        self, config: Config, project_analysis: dict[str, Any]
-    ) -> Config:
+    async def _auto_configure(self, config: Config, project_analysis: dict[str, Any]) -> Config:
         """Auto-configure settings based on project structure analysis.
 
         Args:
@@ -417,24 +405,17 @@ class ProjectConfigurator:
             config.project.name = self.project_path.name.replace("_", " ").title()
 
         # Adjust exclusion patterns based on project structure
-        if (
-            project_analysis.get("has_tests")
-            and "tests/" not in config.project.exclude_patterns
-        ):
+        if project_analysis.get("has_tests") and "tests/" not in config.project.exclude_patterns:
             config.project.exclude_patterns.append("tests/")
 
         # Set documentation folder based on project name
         if not config.obsidian.docs_folder or config.obsidian.docs_folder == "Projects":
-            safe_name = "".join(
-                c for c in config.project.name if c.isalnum() or c in " -_"
-            )
+            safe_name = "".join(c for c in config.project.name if c.isalnum() or c in " -_")
             config.obsidian.docs_folder = f"Projects/{safe_name}"
 
         return config
 
-    async def _interactive_configure(
-        self, config: Config
-    ) -> tuple[Config, dict[str, Any]]:
+    async def _interactive_configure(self, config: Config) -> tuple[Config, dict[str, Any]]:
         """Run interactive configuration (placeholder implementation).
 
         Args:
@@ -476,9 +457,7 @@ class ProjectConfigurator:
         for source_path in config.project.source_paths:
             path = self.project_path / source_path
             if not path.exists():
-                validation["warnings"].append(
-                    f"Source path does not exist: {source_path}"
-                )
+                validation["warnings"].append(f"Source path does not exist: {source_path}")
 
         # Validate Obsidian vault path if provided
         if config.obsidian.vault_path:
@@ -505,9 +484,7 @@ class ProjectConfigurator:
 
         return validation
 
-    async def _save_configuration(
-        self, config: Config, config_path: Path
-    ) -> dict[str, Any]:
+    async def _save_configuration(self, config: Config, config_path: Path) -> dict[str, Any]:
         """Save configuration to file.
 
         Args:
@@ -613,14 +590,13 @@ class ProjectConfigurator:
             project_analysis.get("has_tests")
             and "sphinx.ext.doctest" not in config.sphinx.extensions
         ):
-            suggestions.append(
-                "Tests detected - consider adding 'sphinx.ext.doctest' extension"
-            )
+            suggestions.append("Tests detected - consider adding 'sphinx.ext.doctest' extension")
 
         # Documentation suggestions
         if not project_analysis.get("has_docs"):
             suggestions.append(
-                "No existing documentation found - generated docs will be your primary documentation"
+                "No existing documentation found - "
+                "generated docs will be your primary documentation"
             )
 
         return suggestions

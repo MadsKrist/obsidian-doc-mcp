@@ -131,9 +131,7 @@ output:
             assert features[feature] is True
 
     @pytest.mark.asyncio
-    async def test_server_capabilities_integration(
-        self, mcp_server: DocumentationMCPServer
-    ):
+    async def test_server_capabilities_integration(self, mcp_server: DocumentationMCPServer):
         """Test server capabilities functionality."""
         capabilities = await mcp_server._get_server_capabilities()
         capabilities_data = json.loads(capabilities)
@@ -235,9 +233,7 @@ output:
         assert "main" in module_names or "src.main" in module_names
 
     @pytest.mark.asyncio
-    async def test_project_analysis_error_handling(
-        self, mcp_server: DocumentationMCPServer
-    ):
+    async def test_project_analysis_error_handling(self, mcp_server: DocumentationMCPServer):
         """Test error handling for non-existent project."""
         arguments = {"project_path": "/nonexistent/path/to/project"}
 
@@ -299,9 +295,7 @@ output:
         assert "Project analysis completed successfully:" in analysis_result[0].text
 
         # Step 5: Test configuration loading
-        config = mcp_server.config_manager.load_config(
-            sample_project / ".mcp-docs.yaml"
-        )
+        config = mcp_server.config_manager.load_config(sample_project / ".mcp-docs.yaml")
         assert config.project.name == "Sample Integration Test Project"
 
 
@@ -392,9 +386,7 @@ class TestMCPErrorIntegration:
     @pytest.mark.asyncio
     async def test_nonexistent_project_error(self, mcp_server: DocumentationMCPServer):
         """Test error handling for nonexistent projects."""
-        result = await mcp_server._handle_analyze_project(
-            {"project_path": "/does/not/exist"}
-        )
+        result = await mcp_server._handle_analyze_project({"project_path": "/does/not/exist"})
 
         assert len(result) == 1
         assert "Error: Project path does not exist" in result[0].text

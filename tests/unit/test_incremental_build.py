@@ -14,9 +14,7 @@ class TestFileState:
 
     def test_file_state_creation(self):
         """Test FileState creation."""
-        state = FileState(
-            path="/test/file.py", size=1024, mtime=time.time(), hash="abcdef123456"
-        )
+        state = FileState(path="/test/file.py", size=1024, mtime=time.time(), hash="abcdef123456")
 
         assert state.path == "/test/file.py"
         assert state.size == 1024
@@ -234,9 +232,7 @@ def main():
         output2.write_text("<h1>Temp</h1>")
 
         # Track the outputs
-        manager.mark_files_built(
-            [temp_file], {str(temp_file): [str(output1), str(output2)]}
-        )
+        manager.mark_files_built([temp_file], {str(temp_file): [str(output1), str(output2)]})
 
         # Delete source file
         temp_file.unlink()

@@ -106,9 +106,7 @@ class TestDirectoryOperations:
         ensure_directory(test_dir)
         assert test_dir.exists()
 
-    def test_ensure_directory_permission_error(
-        self, tmp_path: Path, monkeypatch
-    ) -> None:
+    def test_ensure_directory_permission_error(self, tmp_path: Path, monkeypatch) -> None:
         """Test directory creation with permission error."""
 
         def mock_mkdir(self, parents=False, exist_ok=False):

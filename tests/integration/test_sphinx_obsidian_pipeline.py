@@ -163,7 +163,11 @@ def process_data(data):
                 <p>Utility functions package.</p>
                 <h2>Submodules</h2>
                 <ul>
-                    <li><a href="utils.helpers.html#utils.helpers.format_string">utils.helpers.format_string</a></li>
+                    <li>
+                        <a href="utils.helpers.html#utils.helpers.format_string">
+                            utils.helpers.format_string
+                        </a>
+                    </li>
                 </ul>
             </div>
         </body>
@@ -177,9 +181,7 @@ def process_data(data):
         mock_subprocess.return_value.stderr = ""
 
         # Step 1: Generate Sphinx documentation
-        sphinx_result = generate_sphinx_documentation(
-            sample_project_structure, pipeline_config
-        )
+        sphinx_result = generate_sphinx_documentation(sample_project_structure, pipeline_config)
 
         assert sphinx_result["project_name"] == "example_project"
         assert "build_result" in sphinx_result
@@ -212,9 +214,7 @@ def process_data(data):
         output_dir = Path("/tmp/output")
 
         # Should return a result indicating no files were converted
-        result = convert_sphinx_to_obsidian(
-            nonexistent_html_dir, output_dir, pipeline_config
-        )
+        result = convert_sphinx_to_obsidian(nonexistent_html_dir, output_dir, pipeline_config)
 
         # Check that it handled gracefully - no HTML files means only index might be created
         assert result["success"] is True
@@ -240,7 +240,10 @@ def process_data(data):
         <body>
             <div role="main">
                 <h1>Test Module</h1>
-                <p>Module description with <a href="other.html#other.function">cross-reference</a>.</p>
+                <p>
+                    Module description with
+                    <a href="other.html#other.function">cross-reference</a>.
+                </p>
                 <div class="highlight">
                     <pre><code class="python">
 def example_function():
@@ -284,9 +287,7 @@ def example_function():
         # We should have found at least one file with proper frontmatter
         assert found_frontmatter or len(written_calls) >= 1  # Allow for index-only case
 
-    def test_wikilink_cross_references(
-        self, pipeline_config: Config, tmp_path: Path
-    ) -> None:
+    def test_wikilink_cross_references(self, pipeline_config: Config, tmp_path: Path) -> None:
         """Test that cross-references are properly converted to wikilinks."""
         html_dir = tmp_path / "html"
         html_dir.mkdir()
@@ -321,9 +322,7 @@ def example_function():
 
         output_dir = tmp_path / "output"
 
-        with patch(
-            "docs_generator.obsidian_converter.write_file_atomically"
-        ) as mock_write:
+        with patch("docs_generator.obsidian_converter.write_file_atomically") as mock_write:
             result = convert_sphinx_to_obsidian(html_dir, output_dir, pipeline_config)
 
             assert result["success"] is True
@@ -336,10 +335,7 @@ def example_function():
                 args, kwargs = call
                 if len(args) >= 2:
                     content = args[1]
-                    if (
-                        "[[module_b|Module B]]" in content
-                        or "[[module_a|Module A]]" in content
-                    ):
+                    if "[[module_b|Module B]]" in content or "[[module_a|Module A]]" in content:
                         wikilink_found = True
 
                     # Check for anchor links

@@ -57,9 +57,7 @@ class ObsidianVaultManager:
             raise VaultNotFoundError(f"Vault path does not exist: {self.vault_path}")
 
         if not self.vault_path.is_dir():
-            raise VaultValidationError(
-                f"Vault path is not a directory: {self.vault_path}"
-            )
+            raise VaultValidationError(f"Vault path is not a directory: {self.vault_path}")
 
         # Check for .obsidian directory (indicates an Obsidian vault)
         obsidian_dir = self.vault_path / ".obsidian"
@@ -120,9 +118,7 @@ class ObsidianVaultManager:
             backup_path = self.backup_file(file_path)
 
         # Write content atomically
-        temp_path = file_path.with_suffix(
-            f".tmp_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        )
+        temp_path = file_path.with_suffix(f".tmp_{datetime.now().strftime('%Y%m%d_%H%M%S')}")
         try:
             with open(temp_path, "w", encoding="utf-8") as f:
                 f.write(content)
@@ -135,9 +131,7 @@ class ObsidianVaultManager:
 
         return file_path, backup_path
 
-    def generate_index_file(
-        self, folder_path: Path, title: str, files: list[Path]
-    ) -> str:
+    def generate_index_file(self, folder_path: Path, title: str, files: list[Path]) -> str:
         """Generate an index file for a folder.
 
         Args:
@@ -173,9 +167,7 @@ class ObsidianVaultManager:
             content_lines.extend(["", "## Other Files", ""])
             for file_path in sorted(other_files):
                 relative_path = file_path.relative_to(self.vault_path)
-                content_lines.append(
-                    f"- [{file_path.name}]({relative_path.as_posix()})"
-                )
+                content_lines.append(f"- [{file_path.name}]({relative_path.as_posix()})")
 
         content_lines.append("")
         return "\n".join(content_lines)
@@ -299,9 +291,7 @@ def validate_vault_structure(vault_path: Path) -> list[str]:
     return issues
 
 
-def create_obsidian_frontmatter(
-    title: str, tags: list[str], source_file: str | None = None
-) -> str:
+def create_obsidian_frontmatter(title: str, tags: list[str], source_file: str | None = None) -> str:
     """Create YAML frontmatter for Obsidian notes.
 
     Args:

@@ -41,9 +41,7 @@ class DocumentationStatusResource:
         # Initialize vault manager if vault path is configured
         if config and config.obsidian.vault_path:
             try:
-                self.vault_manager = ObsidianVaultManager(
-                    Path(config.obsidian.vault_path)
-                )
+                self.vault_manager = ObsidianVaultManager(Path(config.obsidian.vault_path))
             except Exception as e:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
@@ -106,9 +104,7 @@ class DocumentationStatusResource:
 
         except Exception as e:
             logger.error(f"Failed to get documentation status: {e}")
-            raise DocumentationStatusError(
-                f"Failed to analyze documentation status: {e}"
-            ) from e
+            raise DocumentationStatusError(f"Failed to analyze documentation status: {e}") from e
 
     async def get_coverage_metrics(self, detailed: bool = False) -> dict[str, Any]:
         """Get detailed coverage metrics.
@@ -192,15 +188,11 @@ class DocumentationStatusResource:
             }
 
             if not self.vault_manager:
-                history[
-                    "message"
-                ] = "Update history requires Obsidian vault configuration"
+                history["message"] = "Update history requires Obsidian vault configuration"
                 return history
 
             # Get documentation files
-            docs_folder = (
-                Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
-            )
+            docs_folder = Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
             if not docs_folder.exists():
                 history["message"] = f"Documentation folder not found: {docs_folder}"
                 return history
@@ -216,9 +208,7 @@ class DocumentationStatusResource:
                     modified_files.append(
                         {
                             "file": str(relative_path),
-                            "last_modified": datetime.fromtimestamp(
-                                file_mtime
-                            ).isoformat(),
+                            "last_modified": datetime.fromtimestamp(file_mtime).isoformat(),
                             "size_bytes": md_file.stat().st_size,
                         }
                     )
@@ -228,22 +218,16 @@ class DocumentationStatusResource:
 
             history["updates"] = modified_files
             history["statistics"]["total_updates"] = len(modified_files)
-            history["statistics"]["files_modified"] = len(
-                {f["file"] for f in modified_files}
-            )
+            history["statistics"]["files_modified"] = len({f["file"] for f in modified_files})
 
             if days > 0:
-                history["statistics"]["average_updates_per_day"] = (
-                    len(modified_files) / days
-                )
+                history["statistics"]["average_updates_per_day"] = len(modified_files) / days
 
             return history
 
         except Exception as e:
             logger.error(f"Failed to get update history: {e}")
-            raise DocumentationStatusError(
-                f"Failed to analyze update history: {e}"
-            ) from e
+            raise DocumentationStatusError(f"Failed to analyze update history: {e}") from e
 
     async def _calculate_coverage(self) -> dict[str, Any]:
         """Calculate documentation coverage metrics.
@@ -253,9 +237,7 @@ class DocumentationStatusResource:
         """
         try:
             # Analyze project structure
-            project_structure = self.analyzer.analyze_project(
-                self.config.project.exclude_patterns
-            )
+            project_structure = self.analyzer.analyze_project(self.config.project.exclude_patterns)
 
             coverage = {
                 "timestamp": datetime.now().isoformat(),
@@ -393,9 +375,7 @@ class DocumentationStatusResource:
                 "recent_issues": [],
             }
 
-            docs_folder = (
-                Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
-            )
+            docs_folder = Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
             if not docs_folder.exists():
                 quality["message"] = f"Documentation folder not found: {docs_folder}"
                 return quality
@@ -412,18 +392,12 @@ class DocumentationStatusResource:
             for check_type in quality["quality_checks"]:
                 check_data = quality["quality_checks"][check_type]
                 if check_data["total"] > 0:
-                    check_data["score"] = (
-                        check_data["passed"] / check_data["total"]
-                    ) * 100
+                    check_data["score"] = (check_data["passed"] / check_data["total"]) * 100
 
             # Calculate overall score (weighted average)
             if quality["total_files"] > 0:
-                total_checks = sum(
-                    check["total"] for check in quality["quality_checks"].values()
-                )
-                passed_checks = sum(
-                    check["passed"] for check in quality["quality_checks"].values()
-                )
+                total_checks = sum(check["total"] for check in quality["quality_checks"].values())
+                passed_checks = sum(check["passed"] for check in quality["quality_checks"].values())
 
                 if total_checks > 0:
                     quality["overall_score"] = (passed_checks / total_checks) * 100
@@ -433,9 +407,7 @@ class DocumentationStatusResource:
         except Exception as e:
             raise DocumentationStatusError(f"Quality calculation failed: {e}") from e
 
-    async def _assess_file_quality(
-        self, file_path: Path, quality: dict[str, Any]
-    ) -> None:
+    async def _assess_file_quality(self, file_path: Path, quality: dict[str, Any]) -> None:
         """Assess the quality of a single documentation file.
 
         Args:
@@ -544,10 +516,7 @@ class DocumentationStatusResource:
 
             # Check for recent documentation changes if vault is available
             if self.vault_manager:
-                docs_folder = (
-                    Path(self.vault_manager.vault_path)
-                    / self.config.obsidian.docs_folder
-                )
+                docs_folder = Path(self.vault_manager.vault_path) / self.config.obsidian.docs_folder
                 if docs_folder.exists():
                     for md_file in docs_folder.rglob("*.md"):
                         if md_file.stat().st_mtime > cutoff_time:
@@ -616,7 +585,8 @@ class DocumentationStatusResource:
         for item_type, data in coverage.get("by_type", {}).items():
             if data["coverage_percentage"] < 30:
                 recommendations.append(
-                    f"Very low {item_type} documentation coverage ({data['coverage_percentage']:.1f}%) - "
+                    f"Very low {item_type} documentation coverage "
+                    f"({data['coverage_percentage']:.1f}%) - "
                     f"add docstrings to {data['total'] - data['documented']} {item_type}"
                 )
 
@@ -708,9 +678,7 @@ class DocumentationStatusResource:
         if quality_score > 0 and quality_score < 70:
             summary["priority_actions"].append("Address quality issues")
         if status.get("recent_changes", {}).get("sync_status") == "docs_behind":
-            summary["priority_actions"].append(
-                "Update documentation to match recent code changes"
-            )
+            summary["priority_actions"].append("Update documentation to match recent code changes")
 
         # Next steps
         recommendations = status.get("recommendations", [])
@@ -780,7 +748,9 @@ async def get_documentation_status_resource(
 # Resource metadata for MCP registration
 RESOURCE_DEFINITION = {
     "name": "documentation_status",
-    "description": "Documentation coverage metrics, quality scores, and improvement recommendations",
+    "description": (
+        "Documentation coverage metrics, quality scores, and improvement recommendations"
+    ),
     "schema": {
         "type": "object",
         "properties": {

@@ -44,9 +44,7 @@ class DocumentationGenerator:
         # Initialize vault manager if vault path is configured
         if config.obsidian.vault_path:
             try:
-                self.vault_manager = ObsidianVaultManager(
-                    Path(config.obsidian.vault_path)
-                )
+                self.vault_manager = ObsidianVaultManager(Path(config.obsidian.vault_path))
             except Exception as e:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
@@ -104,9 +102,7 @@ class DocumentationGenerator:
             logger.info("Converting to Obsidian format")
             obsidian_docs = await self._convert_to_obsidian(sphinx_output)
             results["steps_completed"].append("obsidian_conversion")
-            results["statistics"]["obsidian_files"] = len(
-                obsidian_docs.get("files", {})
-            )
+            results["statistics"]["obsidian_files"] = len(obsidian_docs.get("files", {}))
 
             # Step 4: Save to vault (if configured)
             if self.vault_manager:
@@ -127,21 +123,15 @@ class DocumentationGenerator:
             if progress_callback:
                 progress_callback("Finalizing documentation generation...")
 
-            results["statistics"]["total_files_generated"] = len(
-                results["files_generated"]
-            )
+            results["statistics"]["total_files_generated"] = len(results["files_generated"])
             results["generation_summary"] = self._create_generation_summary(results)
 
-            logger.info(
-                f"Documentation generation completed successfully: {results['statistics']}"
-            )
+            logger.info(f"Documentation generation completed successfully: {results['statistics']}")
             return results
 
         except Exception as e:
             logger.error(f"Documentation generation failed: {e}")
-            raise DocumentationGenerationError(
-                f"Failed to generate documentation: {e}"
-            ) from e
+            raise DocumentationGenerationError(f"Failed to generate documentation: {e}") from e
 
     async def _analyze_project(self):
         """Analyze the Python project structure."""
@@ -179,9 +169,7 @@ class DocumentationGenerator:
                 output_dir,
             )
         except Exception as e:
-            raise DocumentationGenerationError(
-                f"Obsidian conversion failed: {e}"
-            ) from e
+            raise DocumentationGenerationError(f"Obsidian conversion failed: {e}") from e
 
     async def _save_to_vault(self, obsidian_docs) -> dict[str, Any]:
         """Save documentation to Obsidian vault."""
@@ -192,9 +180,7 @@ class DocumentationGenerator:
             results = {"files_created": [], "warnings": []}
 
             # Ensure documentation folder exists
-            docs_folder = self.vault_manager.ensure_folder_exists(
-                self.config.obsidian.docs_folder
-            )
+            docs_folder = self.vault_manager.ensure_folder_exists(self.config.obsidian.docs_folder)
 
             # Save each documentation file
             for file_path, content in obsidian_docs.get("files", {}).items():

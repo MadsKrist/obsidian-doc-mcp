@@ -163,14 +163,10 @@ class ConfigManager:
             elif config_path.suffix.lower() == ".toml":
                 return self._load_toml_config(config_path)
             else:
-                raise ConfigurationError(
-                    f"Unsupported configuration format: {config_path.suffix}"
-                )
+                raise ConfigurationError(f"Unsupported configuration format: {config_path.suffix}")
 
         except Exception as e:
-            raise ConfigurationError(
-                f"Failed to load configuration from {config_path}: {e}"
-            ) from e
+            raise ConfigurationError(f"Failed to load configuration from {config_path}: {e}") from e
 
     def _load_yaml_config(self, config_path: Path) -> Config:
         """Load YAML configuration file.
@@ -197,9 +193,7 @@ class ConfigManager:
         except yaml.YAMLError as e:
             raise ConfigurationError(f"Invalid YAML in {config_path}: {e}") from e
         except FileNotFoundError as e:
-            raise ConfigurationError(
-                f"Configuration file not found: {config_path}"
-            ) from e
+            raise ConfigurationError(f"Configuration file not found: {config_path}") from e
 
     def _load_toml_config(self, config_path: Path) -> Config:
         """Load TOML configuration file.
@@ -222,9 +216,7 @@ class ConfigManager:
         except tomllib.TOMLDecodeError as e:
             raise ConfigurationError(f"Invalid TOML in {config_path}: {e}") from e
         except FileNotFoundError as e:
-            raise ConfigurationError(
-                f"Configuration file not found: {config_path}"
-            ) from e
+            raise ConfigurationError(f"Configuration file not found: {config_path}") from e
 
     def _validate_config(self, config: Config) -> None:
         """Validate configuration values.
@@ -246,9 +238,7 @@ class ConfigManager:
 
         # Validate Obsidian settings
         if config.obsidian.vault_path and not Path(config.obsidian.vault_path).exists():
-            logger.warning(
-                f"Obsidian vault path does not exist: {config.obsidian.vault_path}"
-            )
+            logger.warning(f"Obsidian vault path does not exist: {config.obsidian.vault_path}")
 
         # Validate Sphinx settings
         if not config.sphinx.extensions:
@@ -256,9 +246,7 @@ class ConfigManager:
 
         logger.info("Configuration validation complete")
 
-    def create_default_config_file(
-        self, project_path: Path, config_format: str = "yaml"
-    ) -> Path:
+    def create_default_config_file(self, project_path: Path, config_format: str = "yaml") -> Path:
         """Create a default configuration file.
 
         Args:
@@ -278,9 +266,7 @@ class ConfigManager:
         config_path = project_path / config_filename
 
         if config_path.exists():
-            raise ConfigurationError(
-                f"Configuration file already exists: {config_path}"
-            )
+            raise ConfigurationError(f"Configuration file already exists: {config_path}")
 
         try:
             if config_format == "yaml":
@@ -498,9 +484,7 @@ group_by_module = true
             return default_value
         return env_value.lower() in ("true", "1", "yes", "on")
 
-    def _get_env_override_list(
-        self, env_var: str, default_value: list[str]
-    ) -> list[str]:
+    def _get_env_override_list(self, env_var: str, default_value: list[str]) -> list[str]:
         """Get list configuration value with environment variable override.
 
         Args:
@@ -569,6 +553,4 @@ group_by_module = true
             logger.info(f"Configuration saved to {config_path}")
 
         except Exception as e:
-            raise ConfigurationError(
-                f"Failed to save configuration to {config_path}: {e}"
-            ) from e
+            raise ConfigurationError(f"Failed to save configuration to {config_path}: {e}") from e

@@ -68,9 +68,7 @@ class ParallelDocumentationGenerator:
         # Initialize vault manager if configured
         if config.obsidian.vault_path:
             try:
-                self.vault_manager = ObsidianVaultManager(
-                    Path(config.obsidian.vault_path)
-                )
+                self.vault_manager = ObsidianVaultManager(Path(config.obsidian.vault_path))
             except Exception as e:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
@@ -97,9 +95,7 @@ class ParallelDocumentationGenerator:
                 optimizer,
             ):
                 with monitor.profile_operation("parallel_documentation_generation"):
-                    return await self._generate_with_parallelism(
-                        monitor, progress_callback
-                    )
+                    return await self._generate_with_parallelism(monitor, progress_callback)
         else:
             return await self._generate_with_parallelism(None, progress_callback)
 
@@ -156,9 +152,7 @@ class ParallelDocumentationGenerator:
         if progress_callback:
             progress_callback("Executing parallel documentation generation...")
 
-        logger.info(
-            f"Starting parallel processing of {len(project_structure.modules)} modules"
-        )
+        logger.info(f"Starting parallel processing of {len(project_structure.modules)} modules")
 
         def parallel_progress(message: str, progress: float):
             if progress_callback:
@@ -183,9 +177,7 @@ class ParallelDocumentationGenerator:
         successful_modules = len([r for r in processing_results.values() if r.success])
         results["statistics"]["modules_processed"] = len(processing_results)
         results["statistics"]["successful_modules"] = successful_modules
-        results["statistics"]["failed_modules"] = (
-            len(processing_results) - successful_modules
-        )
+        results["statistics"]["failed_modules"] = len(processing_results) - successful_modules
         results["statistics"]["total_files_generated"] = len(results["files_generated"])
 
         # Memory profile if enabled
@@ -243,9 +235,7 @@ class ParallelDocumentationGenerator:
             module_structure.dependencies.update(module.imports)
 
             # Step 1: Generate Sphinx documentation for this module
-            sphinx_output = self.sphinx_generator.generate_documentation(
-                module_structure
-            )
+            sphinx_output = self.sphinx_generator.generate_documentation(module_structure)
 
             # Step 2: Convert to Obsidian format
             obsidian_docs = self._convert_module_to_obsidian(sphinx_output)
@@ -267,22 +257,16 @@ class ParallelDocumentationGenerator:
             logger.error(f"Failed to process module {module.name}: {e}")
             return {"module_name": module.name, "status": "failed", "error": str(e)}
 
-    def _convert_module_to_obsidian(
-        self, sphinx_output: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _convert_module_to_obsidian(self, sphinx_output: dict[str, Any]) -> dict[str, Any]:
         """Convert Sphinx output to Obsidian format for a single module."""
         from docs_generator.obsidian_converter import convert_sphinx_to_obsidian
 
         sphinx_html_dir = sphinx_output.get("build_dir", Path("."))
-        output_dir = Path(
-            f"./obsidian_output_{sphinx_output.get('project_name', 'module')}"
-        )
+        output_dir = Path(f"./obsidian_output_{sphinx_output.get('project_name', 'module')}")
 
         return convert_sphinx_to_obsidian(sphinx_html_dir, output_dir, self.config)
 
-    def _save_module_to_vault(
-        self, obsidian_docs: dict[str, Any], module_name: str
-    ) -> list[str]:
+    def _save_module_to_vault(self, obsidian_docs: dict[str, Any], module_name: str) -> list[str]:
         """Save module documentation to Obsidian vault."""
         if not self.vault_manager:
             return []
@@ -302,9 +286,7 @@ class ParallelDocumentationGenerator:
                 output_path = module_folder / file_path
                 output_path.parent.mkdir(parents=True, exist_ok=True)
 
-                self.vault_manager.safe_write_file(
-                    output_path, content, create_backup=True
-                )
+                self.vault_manager.safe_write_file(output_path, content, create_backup=True)
                 saved_files.append(str(output_path))
 
         except Exception as e:
@@ -312,9 +294,7 @@ class ParallelDocumentationGenerator:
 
         return saved_files
 
-    async def _collect_parallel_results(
-        self, processing_results: dict[str, Any]
-    ) -> list[str]:
+    async def _collect_parallel_results(self, processing_results: dict[str, Any]) -> list[str]:
         """Collect and organize results from parallel processing."""
         all_generated_files = []
 
@@ -378,9 +358,7 @@ class ParallelDocumentationGenerator:
             "total_modules": total_modules,
             "independent_modules": independent_modules,
             "modules_with_dependencies": dependency_chains,
-            "dependency_ratio": dependency_chains / total_modules
-            if total_modules > 0
-            else 0,
+            "dependency_ratio": dependency_chains / total_modules if total_modules > 0 else 0,
             "estimated_sequential_time_seconds": sequential_time,
             "estimated_parallel_time_seconds": parallel_time,
             "estimated_speedup_factor": speedup_factor,
@@ -409,8 +387,7 @@ class ParallelDocumentationGenerator:
 
         if speedup_factor < 2.0:
             recommendations.append(
-                "Limited parallel speedup expected - consider using "
-                "incremental builds instead"
+                "Limited parallel speedup expected - consider using incremental builds instead"
             )
 
         if total_modules < 10:
@@ -420,8 +397,7 @@ class ParallelDocumentationGenerator:
 
         if speedup_factor > 5.0:
             recommendations.append(
-                "Excellent parallelization potential - parallel processing "
-                "highly recommended"
+                "Excellent parallelization potential - parallel processing highly recommended"
             )
 
         return recommendations

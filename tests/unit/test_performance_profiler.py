@@ -85,9 +85,7 @@ class TestPerformanceReport:
 
         # Add metrics with different durations
         report.add_metric(PerformanceMetrics(name="fast_op", duration=0.5))
-        report.add_metric(
-            PerformanceMetrics(name="slow_op", duration=3.0)
-        )  # 30% of total
+        report.add_metric(PerformanceMetrics(name="slow_op", duration=3.0))  # 30% of total
         report.add_metric(PerformanceMetrics(name="medium_op", duration=1.5))
 
         report.identify_bottlenecks(threshold_ratio=0.2)  # 20% threshold
@@ -107,7 +105,8 @@ class TestPerformanceReport:
     def test_generate_recommendations_high_memory(self):
         """Test recommendations for high memory usage."""
         report = PerformanceReport(
-            total_duration=5.0, peak_memory=600 * 1024 * 1024  # 600MB
+            total_duration=5.0,
+            peak_memory=600 * 1024 * 1024,  # 600MB
         )
 
         report.generate_recommendations()
@@ -127,9 +126,7 @@ class TestPerformanceReport:
     def test_generate_recommendations_high_cpu(self):
         """Test recommendations for high CPU usage."""
         report = PerformanceReport(total_duration=5.0, peak_memory=1024)
-        report.add_metric(
-            PerformanceMetrics(name="cpu_intensive", duration=1.0, cpu_percent=85.0)
-        )
+        report.add_metric(PerformanceMetrics(name="cpu_intensive", duration=1.0, cpu_percent=85.0))
 
         report.generate_recommendations()
 
@@ -139,9 +136,7 @@ class TestPerformanceReport:
     def test_generate_recommendations_high_calls(self):
         """Test recommendations for high function call counts."""
         report = PerformanceReport(total_duration=5.0, peak_memory=1024)
-        report.add_metric(
-            PerformanceMetrics(name="call_heavy", duration=1.0, calls_count=15000)
-        )
+        report.add_metric(PerformanceMetrics(name="call_heavy", duration=1.0, calls_count=15000))
 
         report.generate_recommendations()
 
@@ -418,9 +413,7 @@ class TestDecoratorsAndHelpers:
         def test_function(x):
             return x * 2
 
-        with patch(
-            "utils.performance_profiler.PerformanceProfiler"
-        ) as mock_profiler_class:
+        with patch("utils.performance_profiler.PerformanceProfiler") as mock_profiler_class:
             mock_profiler = Mock()
             mock_profiler.profile_section.return_value.__enter__ = Mock()
             mock_profiler.profile_section.return_value.__exit__ = Mock()
@@ -463,16 +456,10 @@ class TestDecoratorsAndHelpers:
 
     def test_profile_context_manager(self):
         """Test profile_context context manager."""
-        with patch(
-            "utils.performance_profiler.PerformanceProfiler"
-        ) as mock_profiler_class:
+        with patch("utils.performance_profiler.PerformanceProfiler") as mock_profiler_class:
             mock_profiler = Mock()
-            mock_profiler.profile_section.return_value.__enter__ = Mock(
-                return_value=None
-            )
-            mock_profiler.profile_section.return_value.__exit__ = Mock(
-                return_value=None
-            )
+            mock_profiler.profile_section.return_value.__enter__ = Mock(return_value=None)
+            mock_profiler.profile_section.return_value.__exit__ = Mock(return_value=None)
             mock_profiler_class.return_value = mock_profiler
 
             with profile_context("test_context") as profiler:
@@ -489,9 +476,7 @@ class TestDecoratorsAndHelpers:
             (project_path / "module1.py").write_text("# Module 1")
             (project_path / "module2.py").write_text("# Module 2")
 
-            with patch(
-                "utils.performance_profiler.PerformanceProfiler"
-            ) as mock_profiler_class:
+            with patch("utils.performance_profiler.PerformanceProfiler") as mock_profiler_class:
                 mock_profiler = Mock()
                 mock_profiler.profile_section.return_value.__enter__ = Mock()
                 mock_profiler.profile_section.return_value.__exit__ = Mock()
@@ -513,9 +498,10 @@ class TestCPUMonitoring:
         """Test CPU monitoring start and stop."""
         profiler = PerformanceProfiler(enable_memory_tracing=False)
 
-        with patch(
-            "utils.performance_profiler.psutil.Process"
-        ) as mock_process_class, patch("threading.Thread") as mock_thread_class:
+        with (
+            patch("utils.performance_profiler.psutil.Process") as mock_process_class,
+            patch("threading.Thread") as mock_thread_class,
+        ):
             mock_process = Mock()
             mock_process.cpu_percent.return_value = 75.0
             mock_process_class.return_value = mock_process

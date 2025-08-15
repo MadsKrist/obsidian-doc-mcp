@@ -45,9 +45,7 @@ class ProcessingResult(Generic[R]):
     @property
     def duration(self) -> float:
         """Get the processing duration."""
-        return (
-            self.end_time - self.start_time if self.end_time > self.start_time else 0.0
-        )
+        return self.end_time - self.start_time if self.end_time > self.start_time else 0.0
 
     @property
     def success(self) -> bool:
@@ -65,9 +63,7 @@ class DependencyResolver:
     def add_task(self, task: ProcessingTask) -> None:
         """Add a task to the dependency graph."""
         self.tasks[task.task_id] = task
-        logger.debug(
-            f"Added task {task.task_id} with dependencies: {task.dependencies}"
-        )
+        logger.debug(f"Added task {task.task_id} with dependencies: {task.dependencies}")
 
     def resolve_dependencies(self) -> list[list[str]]:
         """Resolve dependencies and return tasks grouped by execution level.
@@ -98,9 +94,7 @@ class DependencyResolver:
                     if missing:
                         remaining_deps.append(f"{task_id} -> {missing}")
 
-                raise ValueError(
-                    f"Circular dependency or missing tasks detected: {remaining_deps}"
-                )
+                raise ValueError(f"Circular dependency or missing tasks detected: {remaining_deps}")
 
             # Sort by priority (higher priority first)
             ready_tasks.sort(key=lambda tid: self.tasks[tid].priority, reverse=True)
@@ -112,8 +106,7 @@ class DependencyResolver:
                 completed_tasks.add(task_id)
 
         logger.info(
-            f"Resolved {len(self.tasks)} tasks into "
-            f"{len(execution_levels)} execution levels"
+            f"Resolved {len(self.tasks)} tasks into {len(execution_levels)} execution levels"
         )
         return execution_levels
 
@@ -134,9 +127,7 @@ class ParallelProcessor:
             use_threads: Use threads instead of processes
             timeout_per_task: Timeout per task in seconds
         """
-        self.max_workers = max_workers or min(
-            32, (multiprocessing.cpu_count() or 1) + 4
-        )
+        self.max_workers = max_workers or min(32, (multiprocessing.cpu_count() or 1) + 4)
         self.use_threads = use_threads
         self.timeout_per_task = timeout_per_task
         self.dependency_resolver = DependencyResolver()
@@ -201,8 +192,7 @@ class ParallelProcessor:
 
         for level_idx, task_ids in enumerate(execution_levels):
             logger.info(
-                f"Processing level {level_idx + 1}/{len(execution_levels)}: "
-                f"{len(task_ids)} tasks"
+                f"Processing level {level_idx + 1}/{len(execution_levels)}: {len(task_ids)} tasks"
             )
 
             if progress_callback:
@@ -216,9 +206,7 @@ class ParallelProcessor:
             self.results.update(level_results)
 
             # Check for failures
-            failed_tasks = [
-                tid for tid, result in level_results.items() if not result.success
-            ]
+            failed_tasks = [tid for tid, result in level_results.items() if not result.success]
             if failed_tasks:
                 logger.error(f"Failed tasks in level {level_idx + 1}: {failed_tasks}")
                 # Optionally continue or stop based on failure handling strategy
@@ -256,9 +244,7 @@ class ParallelProcessor:
 
         with executor_class(max_workers=min(self.max_workers, len(tasks))) as executor:
             # Submit all tasks
-            future_to_task = {
-                executor.submit(self._execute_task, task): task for task in tasks
-            }
+            future_to_task = {executor.submit(self._execute_task, task): task for task in tasks}
 
             # Collect results as they complete
             for future in concurrent.futures.as_completed(future_to_task, timeout=None):
@@ -269,30 +255,20 @@ class ParallelProcessor:
                     level_results[task.task_id] = result
 
                     if result.success:
-                        logger.debug(
-                            f"Task {task.task_id} completed in {result.duration:.2f}s"
-                        )
+                        logger.debug(f"Task {task.task_id} completed in {result.duration:.2f}s")
                     else:
                         logger.error(f"Task {task.task_id} failed: {result.error}")
 
                 except concurrent.futures.TimeoutError:
-                    logger.error(
-                        f"Task {task.task_id} timed out after {self.timeout_per_task}s"
-                    )
+                    logger.error(f"Task {task.task_id} timed out after {self.timeout_per_task}s")
                     level_results[task.task_id] = ProcessingResult(
                         task_id=task.task_id,
-                        error=TimeoutError(
-                            f"Task timed out after {self.timeout_per_task}s"
-                        ),
+                        error=TimeoutError(f"Task timed out after {self.timeout_per_task}s"),
                     )
 
                 except Exception as e:
-                    logger.error(
-                        f"Unexpected error processing task {task.task_id}: {e}"
-                    )
-                    level_results[task.task_id] = ProcessingResult(
-                        task_id=task.task_id, error=e
-                    )
+                    logger.error(f"Unexpected error processing task {task.task_id}: {e}")
+                    level_results[task.task_id] = ProcessingResult(task_id=task.task_id, error=e)
 
         return level_results
 
@@ -333,9 +309,7 @@ class ParallelProcessor:
             "total_tasks": len(self.results),
             "successful_tasks": len(successful_results),
             "failed_tasks": len(failed_results),
-            "success_rate": len(successful_results) / len(self.results)
-            if self.results
-            else 0,
+            "success_rate": len(successful_results) / len(self.results) if self.results else 0,
             "total_processing_time": total_time,
             "successful_processing_time": successful_time,
             "average_task_time": successful_time / len(successful_results)
@@ -402,9 +376,7 @@ class ModuleDependencyAnalyzer:
             for dep in list(deps):
                 # If any other dependency already depends on this one, remove it
                 for other_dep in deps:
-                    if other_dep != dep and dep in self.import_graph.get(
-                        other_dep, set()
-                    ):
+                    if other_dep != dep and dep in self.import_graph.get(other_dep, set()):
                         deps.discard(dep)
                         break
 
@@ -412,9 +384,7 @@ class ModuleDependencyAnalyzer:
 
     def get_independent_modules(self) -> list[str]:
         """Get modules that have no dependencies and can be processed first."""
-        return [
-            module_name for module_name, deps in self.import_graph.items() if not deps
-        ]
+        return [module_name for module_name, deps in self.import_graph.items() if not deps]
 
     def estimate_processing_complexity(self, module) -> float:
         """Estimate processing complexity for a module (for priority/scheduling).

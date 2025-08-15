@@ -161,9 +161,7 @@ class TestProgressTracker:
         tracker = ProgressTracker()
 
         parent_progress = tracker.start_operation("parent_op", total=10)
-        child_progress = tracker.start_operation(
-            "child_op", total=5, parent="parent_op"
-        )
+        child_progress = tracker.start_operation("child_op", total=5, parent="parent_op")
 
         assert child_progress.parent == "parent_op"
         assert "child_op" in parent_progress.children
@@ -174,9 +172,7 @@ class TestProgressTracker:
 
         with patch("time.time", side_effect=[1000.0, 1005.0]):
             tracker.start_operation("test_op", total=100)
-            progress = tracker.update_progress(
-                "test_op", current=25, message="25% done"
-            )
+            progress = tracker.update_progress("test_op", current=25, message="25% done")
 
         assert progress.current == 25
         assert progress.message == "25% done"
@@ -197,9 +193,7 @@ class TestProgressTracker:
         tracker = ProgressTracker()
 
         tracker.start_operation("test_op", total=100, metadata={"stage": "init"})
-        progress = tracker.update_progress(
-            "test_op", metadata={"stage": "processing", "files": 10}
-        )
+        progress = tracker.update_progress("test_op", metadata={"stage": "processing", "files": 10})
 
         assert progress.metadata["stage"] == "processing"
         assert progress.metadata["files"] == 10
@@ -229,9 +223,7 @@ class TestProgressTracker:
 
         with patch("time.time", side_effect=[1000.0, 1015.0]):
             tracker.start_operation("test_op", total=100)
-            progress = tracker.complete_operation(
-                "test_op", ProgressStatus.COMPLETED, "Finished!"
-            )
+            progress = tracker.complete_operation("test_op", ProgressStatus.COMPLETED, "Finished!")
 
         assert progress.status == ProgressStatus.COMPLETED
         assert progress.message == "Finished!"
@@ -478,9 +470,7 @@ class TestContextManagerAndDecorators:
         tracker = ProgressTracker()
 
         with patch("time.time", side_effect=[1000.0, 1010.0, 1015.0]):
-            with track_progress(
-                tracker, "test_context", total=100, message="Testing"
-            ) as progress:
+            with track_progress(tracker, "test_context", total=100, message="Testing") as progress:
                 assert progress.name == "test_context"
                 assert progress.status == ProgressStatus.RUNNING
                 tracker.update_progress("test_context", current=50)

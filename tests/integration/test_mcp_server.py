@@ -152,9 +152,7 @@ project:
         assert "Project analysis completed successfully" in result[0].text
 
     @pytest.mark.asyncio
-    async def test_server_status_methods(
-        self, mcp_server: DocumentationMCPServer
-    ) -> None:
+    async def test_server_status_methods(self, mcp_server: DocumentationMCPServer) -> None:
         """Test server status and capabilities methods."""
         status = await mcp_server._get_server_status()
         capabilities = await mcp_server._get_server_capabilities()
@@ -188,9 +186,7 @@ class TestMCPServerErrorHandling:
         """Test analyze_project with a project containing syntax errors."""
         # Create a project with syntax error
         bad_file = temp_dir / "bad_syntax.py"
-        bad_file.write_text(
-            "def incomplete_function(\n    # Missing closing parenthesis"
-        )
+        bad_file.write_text("def incomplete_function(\n    # Missing closing parenthesis")
 
         arguments = {"project_path": str(temp_dir)}
 

@@ -110,9 +110,7 @@ class SampleClass:
         # Results should be identical
         assert len(structure1.modules) == len(structure2.modules)
         assert structure1.modules[0].name == structure2.modules[0].name
-        assert len(structure1.modules[0].functions) == len(
-            structure2.modules[0].functions
-        )
+        assert len(structure1.modules[0].functions) == len(structure2.modules[0].functions)
 
         # Second run should be significantly faster (cache hit)
         # Note: In practice, this test might be flaky due to timing variations
@@ -155,9 +153,7 @@ def new_function() -> None:
     def test_cache_ttl_expiration(self, sample_python_file: Path) -> None:
         """Test that cache entries expire after TTL."""
         # Use very short TTL for testing
-        analyzer = PythonProjectAnalyzer(
-            sample_python_file, enable_cache=True, cache_ttl=1
-        )
+        analyzer = PythonProjectAnalyzer(sample_python_file, enable_cache=True, cache_ttl=1)
 
         # First analysis
         analyzer.analyze_project()
@@ -223,9 +219,7 @@ def new_function() -> None:
         """Test that syntax errors don't break caching."""
         # Create file with syntax error
         bad_file = sample_python_file / "bad_syntax.py"
-        bad_file.write_text(
-            "def incomplete_function(\n    # Missing closing parenthesis"
-        )
+        bad_file.write_text("def incomplete_function(\n    # Missing closing parenthesis")
 
         analyzer = PythonProjectAnalyzer(sample_python_file, enable_cache=True)
 

@@ -57,9 +57,7 @@ class MemoryOptimizedDocumentationGenerator:
         # Initialize vault manager if configured
         if config.obsidian.vault_path:
             try:
-                self.vault_manager = ObsidianVaultManager(
-                    Path(config.obsidian.vault_path)
-                )
+                self.vault_manager = ObsidianVaultManager(Path(config.obsidian.vault_path))
             except Exception as e:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
@@ -85,9 +83,7 @@ class MemoryOptimizedDocumentationGenerator:
             monitor_operations=True,
         ) as (monitor, optimizer):
             with monitor.profile_operation("memory_optimized_documentation_generation"):
-                return await self._generate_with_optimization(
-                    monitor, optimizer, progress_callback
-                )
+                return await self._generate_with_optimization(monitor, optimizer, progress_callback)
 
     async def _generate_with_optimization(
         self,
@@ -118,8 +114,7 @@ class MemoryOptimizedDocumentationGenerator:
         # Step 2: Process files in memory-efficient batches
         if progress_callback:
             progress_callback(
-                f"Processing {len(python_files)} files in batches of "
-                f"{self.batch_size}..."
+                f"Processing {len(python_files)} files in batches of {self.batch_size}..."
             )
 
         all_modules = []
@@ -130,13 +125,10 @@ class MemoryOptimizedDocumentationGenerator:
                 with monitor.profile_operation(batch_name):
                     if progress_callback:
                         progress_callback(
-                            f"Analyzing batch {batch_idx + 1} "
-                            f"({len(batch_files)} files)..."
+                            f"Analyzing batch {batch_idx + 1} ({len(batch_files)} files)..."
                         )
 
-                    batch_modules = await self._analyze_files_batch(
-                        batch_files, optimizer
-                    )
+                    batch_modules = await self._analyze_files_batch(batch_files, optimizer)
                     all_modules.extend(batch_modules)
 
                     # Take snapshot after each batch
@@ -264,9 +256,7 @@ class MemoryOptimizedDocumentationGenerator:
                     del sphinx_output, obsidian_docs
 
                 except Exception as e:
-                    logger.error(
-                        f"Failed to generate docs for batch {batch_idx + 1}: {e}"
-                    )
+                    logger.error(f"Failed to generate docs for batch {batch_idx + 1}: {e}")
                     continue
 
         return generated_files
@@ -287,9 +277,7 @@ class MemoryOptimizedDocumentationGenerator:
 
         return structure
 
-    async def _convert_batch_to_obsidian(
-        self, sphinx_output: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _convert_batch_to_obsidian(self, sphinx_output: dict[str, Any]) -> dict[str, Any]:
         """Convert a batch of Sphinx output to Obsidian format."""
         from docs_generator.obsidian_converter import convert_sphinx_to_obsidian
 
@@ -318,9 +306,7 @@ class MemoryOptimizedDocumentationGenerator:
                 output_path.parent.mkdir(parents=True, exist_ok=True)
 
                 # Use vault manager's safe write method
-                self.vault_manager.safe_write_file(
-                    output_path, content, create_backup=True
-                )
+                self.vault_manager.safe_write_file(output_path, content, create_backup=True)
                 saved_files.append(str(output_path))
 
         except Exception as e:
@@ -354,9 +340,7 @@ class MemoryOptimizedDocumentationGenerator:
 
             # Estimate based on sample
             if monitor.current_profile and sample_size > 0:
-                avg_memory_per_file = (
-                    monitor.current_profile.memory_delta_mb / sample_size
-                )
+                avg_memory_per_file = monitor.current_profile.memory_delta_mb / sample_size
             else:
                 avg_memory_per_file = 0
             estimated_total_memory = avg_memory_per_file * len(python_files)
@@ -366,8 +350,6 @@ class MemoryOptimizedDocumentationGenerator:
                 "sample_files": sample_size,
                 "avg_memory_per_file_mb": avg_memory_per_file,
                 "estimated_total_memory_mb": estimated_total_memory,
-                "recommended_batch_size": max(
-                    1, int(100 / max(avg_memory_per_file, 0.1))
-                ),
+                "recommended_batch_size": max(1, int(100 / max(avg_memory_per_file, 0.1))),
                 "memory_recommendations": monitor.get_memory_recommendations(),
             }

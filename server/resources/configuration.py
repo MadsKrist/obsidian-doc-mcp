@@ -196,21 +196,15 @@ class ConfigurationResource:
             else:
                 # Reset specific section
                 if self.config_file_path.exists():
-                    current_config = self.config_manager.load_config(
-                        self.config_file_path
-                    )
+                    current_config = self.config_manager.load_config(self.config_file_path)
                 else:
                     current_config = Config()
 
                 # Reset the specified section to defaults
                 default_config = Config()
-                if hasattr(current_config, section) and hasattr(
-                    default_config, section
-                ):
+                if hasattr(current_config, section) and hasattr(default_config, section):
                     setattr(current_config, section, getattr(default_config, section))
-                    self.config_manager.save_config(
-                        current_config, self.config_file_path
-                    )
+                    self.config_manager.save_config(current_config, self.config_file_path)
 
                     return {
                         "success": True,
@@ -220,9 +214,7 @@ class ConfigurationResource:
                         "reset_timestamp": datetime.now().isoformat(),
                     }
                 else:
-                    raise ConfigurationError(
-                        f"Unknown configuration section: {section}"
-                    )
+                    raise ConfigurationError(f"Unknown configuration section: {section}")
 
         except Exception as e:
             logger.error(f"Failed to reset configuration: {e}")
@@ -272,7 +264,9 @@ class ConfigurationResource:
                                 "type": "boolean",
                                 "required": False,
                                 "default": False,
-                                "description": "Include private methods and classes in documentation",
+                                "description": (
+                                    "Include private methods and classes in documentation"
+                                ),
                             },
                         },
                     },
@@ -351,9 +345,7 @@ class ConfigurationResource:
                     },
                 },
                 "examples": {
-                    "minimal": {
-                        "project": {"name": "My Project", "source_paths": ["src/"]}
-                    },
+                    "minimal": {"project": {"name": "My Project", "source_paths": ["src/"]}},
                     "complete": {
                         "project": {
                             "name": "Advanced Project",
@@ -453,9 +445,7 @@ class ConfigurationResource:
                     if hasattr(section_obj, field_name):
                         setattr(section_obj, field_name, field_value)
                     else:
-                        logger.warning(
-                            f"Unknown field '{field_name}' in section '{section_name}'"
-                        )
+                        logger.warning(f"Unknown field '{field_name}' in section '{section_name}'")
             else:
                 logger.warning(f"Unknown configuration section: {section_name}")
 
@@ -504,7 +494,9 @@ class ConfigurationResource:
                 validation_results["validation_errors"].append(
                     {
                         "type": "vault_not_found",
-                        "message": f"Obsidian vault path does not exist: {config.obsidian.vault_path}",
+                        "message": (
+                            f"Obsidian vault path does not exist: {config.obsidian.vault_path}"
+                        ),
                         "severity": "warning",
                         "field": "obsidian.vault_path",
                     }
@@ -516,10 +508,7 @@ class ConfigurationResource:
                 "Consider configuring obsidian.vault_path for Obsidian integration"
             )
 
-        if (
-            len(config.project.source_paths) == 1
-            and config.project.source_paths[0] == "src/"
-        ):
+        if len(config.project.source_paths) == 1 and config.project.source_paths[0] == "src/":
             project_has_src = (self.project_path / "src").exists()
             if not project_has_src:
                 validation_results["recommendations"].append(

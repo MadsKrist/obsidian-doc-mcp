@@ -142,9 +142,7 @@ class TestDependencyResolver:
         """Test detection of missing dependencies."""
         resolver = DependencyResolver()
 
-        task1 = ProcessingTask(
-            "task1", "data1", lambda x: x, dependencies={"missing_task"}
-        )
+        task1 = ProcessingTask("task1", "data1", lambda x: x, dependencies={"missing_task"})
         resolver.add_task(task1)
 
         with pytest.raises(ValueError, match="Circular dependency or missing tasks"):

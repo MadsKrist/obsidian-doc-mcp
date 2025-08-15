@@ -39,9 +39,7 @@ class ChangeDetector:
         self.config = config
         self.project_path = Path(config.project.source_paths[0])
 
-    def detect_changed_files(
-        self, changed_files: list[str] | None = None
-    ) -> dict[str, Any]:
+    def detect_changed_files(self, changed_files: list[str] | None = None) -> dict[str, Any]:
         """Detect files that need documentation updates.
 
         Args:
@@ -172,9 +170,7 @@ class IncrementalDocumentationUpdater:
         # Initialize vault manager if vault path is configured
         if config.obsidian.vault_path:
             try:
-                self.vault_manager = ObsidianVaultManager(
-                    Path(config.obsidian.vault_path)
-                )
+                self.vault_manager = ObsidianVaultManager(Path(config.obsidian.vault_path))
             except Exception as e:
                 logger.warning(f"Failed to initialize vault manager: {e}")
 
@@ -225,9 +221,7 @@ class IncrementalDocumentationUpdater:
                 ]
             ):
                 results["status"] = "no_changes"
-                results[
-                    "message"
-                ] = "No changes detected that require documentation updates"
+                results["message"] = "No changes detected that require documentation updates"
                 return results
 
             # Step 2: Handle configuration changes
@@ -235,9 +229,7 @@ class IncrementalDocumentationUpdater:
                 if progress_callback:
                     progress_callback("Processing configuration changes...")
 
-                config_results = await self._handle_config_changes(
-                    changes["config_files"]
-                )
+                config_results = await self._handle_config_changes(changes["config_files"])
                 results["steps_completed"].append("config_processing")
                 results["warnings"].extend(config_results.get("warnings", []))
 
@@ -246,14 +238,10 @@ class IncrementalDocumentationUpdater:
                 if progress_callback:
                     progress_callback("Updating Python documentation...")
 
-                python_results = await self._update_python_documentation(
-                    changes["python_files"]
-                )
+                python_results = await self._update_python_documentation(changes["python_files"])
                 results["steps_completed"].append("python_documentation_update")
                 results["files_updated"].extend(python_results["files_updated"])
-                results["conflicts_resolved"].extend(
-                    python_results.get("conflicts_resolved", [])
-                )
+                results["conflicts_resolved"].extend(python_results.get("conflicts_resolved", []))
                 results["warnings"].extend(python_results.get("warnings", []))
 
             # Step 4: Update cross-references and index
@@ -268,16 +256,12 @@ class IncrementalDocumentationUpdater:
             results["statistics"]["total_files_updated"] = len(results["files_updated"])
             results["update_summary"] = self._create_update_summary(results)
 
-            logger.info(
-                f"Incremental documentation update completed: {results['statistics']}"
-            )
+            logger.info(f"Incremental documentation update completed: {results['statistics']}")
             return results
 
         except Exception as e:
             logger.error(f"Documentation update failed: {e}")
-            raise DocumentationUpdateError(
-                f"Failed to update documentation: {e}"
-            ) from e
+            raise DocumentationUpdateError(f"Failed to update documentation: {e}") from e
 
     async def _handle_config_changes(self, config_files: list[str]) -> dict[str, Any]:
         """Handle configuration file changes.
@@ -302,9 +286,7 @@ class IncrementalDocumentationUpdater:
 
         return results
 
-    async def _update_python_documentation(
-        self, python_files: list[str]
-    ) -> dict[str, Any]:
+    async def _update_python_documentation(self, python_files: list[str]) -> dict[str, Any]:
         """Update documentation for specific Python files.
 
         Args:
@@ -344,15 +326,11 @@ class IncrementalDocumentationUpdater:
 
                 if sphinx_output:
                     # Convert to Obsidian format
-                    obsidian_docs = await self._convert_module_to_obsidian(
-                        sphinx_output, py_file
-                    )
+                    obsidian_docs = await self._convert_module_to_obsidian(sphinx_output, py_file)
 
                     # Save to vault with conflict resolution
                     if self.vault_manager:
-                        save_results = await self._save_module_docs(
-                            obsidian_docs, py_file
-                        )
+                        save_results = await self._save_module_docs(obsidian_docs, py_file)
                         results["files_updated"].extend(save_results["files_updated"])
                         results["conflicts_resolved"].extend(
                             save_results.get("conflicts_resolved", [])
@@ -360,9 +338,7 @@ class IncrementalDocumentationUpdater:
                         results["warnings"].extend(save_results.get("warnings", []))
 
         except Exception as e:
-            raise DocumentationUpdateError(
-                f"Failed to update Python documentation: {e}"
-            ) from e
+            raise DocumentationUpdateError(f"Failed to update Python documentation: {e}") from e
 
         return results
 
@@ -445,17 +421,13 @@ class IncrementalDocumentationUpdater:
         }
 
         try:
-            docs_folder = self.vault_manager.ensure_folder_exists(
-                self.config.obsidian.docs_folder
-            )
+            docs_folder = self.vault_manager.ensure_folder_exists(self.config.obsidian.docs_folder)
 
             for file_path, content in obsidian_docs.get("files", {}).items():
                 target_path = docs_folder / file_path
 
                 # Check for manual edits and handle conflicts
-                conflict_resolution = await self._resolve_conflicts(
-                    target_path, content
-                )
+                conflict_resolution = await self._resolve_conflicts(target_path, content)
 
                 if conflict_resolution["action"] == "skip":
                     results["warnings"].append(
@@ -487,9 +459,7 @@ class IncrementalDocumentationUpdater:
 
         return results
 
-    async def _resolve_conflicts(
-        self, target_path: Path, new_content: str
-    ) -> dict[str, Any]:
+    async def _resolve_conflicts(self, target_path: Path, new_content: str) -> dict[str, Any]:
         """Resolve conflicts between existing documentation and new content.
 
         Args:
@@ -573,9 +543,7 @@ class IncrementalDocumentationUpdater:
 
         try:
             # Update index file with current state
-            docs_folder = self.vault_manager.ensure_folder_exists(
-                self.config.obsidian.docs_folder
-            )
+            docs_folder = self.vault_manager.ensure_folder_exists(self.config.obsidian.docs_folder)
 
             index_path = docs_folder / "index.md"
             index_content = await self._generate_updated_index()

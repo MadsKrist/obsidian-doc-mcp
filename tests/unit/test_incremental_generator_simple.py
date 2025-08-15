@@ -85,9 +85,7 @@ class TestIncrementalGeneratorBasics:
         assert generator.enable_incremental is False
 
     @pytest.mark.asyncio
-    async def test_should_perform_full_build_first_run(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_should_perform_full_build_first_run(self, sample_config, temp_project_dir):
         """Test full build detection on first run."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -99,9 +97,7 @@ class TestIncrementalGeneratorBasics:
         assert should_full is True
 
     @pytest.mark.asyncio
-    async def test_should_perform_full_build_forced(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_should_perform_full_build_forced(self, sample_config, temp_project_dir):
         """Test forced full build."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -126,9 +122,7 @@ class TestIncrementalGeneratorBasics:
             modules=[],
         )
 
-        with patch.object(
-            generator.analyzer, "analyze_project", return_value=mock_structure
-        ):
+        with patch.object(generator.analyzer, "analyze_project", return_value=mock_structure):
             result = await generator._analyze_project()
             assert result == mock_structure
 
@@ -282,9 +276,7 @@ class TestIncrementalGeneratorErrorHandling:
             modules=[],
         )
 
-        with patch.object(
-            generator.analyzer, "analyze_project", return_value=mock_structure
-        ):
+        with patch.object(generator.analyzer, "analyze_project", return_value=mock_structure):
             with patch.object(generator, "_generate_sphinx_docs") as mock_sphinx:
                 mock_sphinx.side_effect = RuntimeError("Sphinx failed")
 
@@ -298,9 +290,7 @@ class TestIncrementalGeneratorIntegration:
     """Integration-style tests with mocked external dependencies."""
 
     @pytest.mark.asyncio
-    async def test_full_generation_pipeline_mocked(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_full_generation_pipeline_mocked(self, sample_config, temp_project_dir):
         """Test full generation pipeline with all external dependencies mocked."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -315,12 +305,8 @@ class TestIncrementalGeneratorIntegration:
         )
 
         # Mock all external calls
-        with patch.object(
-            generator.analyzer, "analyze_project", return_value=mock_structure
-        ):
-            with patch.object(
-                generator.sphinx_generator, "generate_documentation"
-            ) as mock_sphinx:
+        with patch.object(generator.analyzer, "analyze_project", return_value=mock_structure):
+            with patch.object(generator.sphinx_generator, "generate_documentation") as mock_sphinx:
                 with patch(
                     "docs_generator.obsidian_converter.convert_sphinx_to_obsidian"
                 ) as mock_obsidian:
@@ -330,9 +316,7 @@ class TestIncrementalGeneratorIntegration:
                         "files": ["index.html"],
                         "project_name": "TestProject",
                     }
-                    mock_obsidian.return_value = {
-                        "files": {"index.md": "# Test\nContent"}
-                    }
+                    mock_obsidian.return_value = {"files": {"index.md": "# Test\nContent"}}
 
                     # Run generation
                     result = await generator.generate_documentation()

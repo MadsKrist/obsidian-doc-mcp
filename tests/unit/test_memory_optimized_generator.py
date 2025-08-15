@@ -142,9 +142,7 @@ class TestMemoryOptimizedGenerator:
         assert files[0].name == "sample_module.py"
 
     @pytest.mark.asyncio
-    async def test_discover_files_with_exclusions(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_discover_files_with_exclusions(self, sample_config, temp_project_dir):
         """Test file discovery with exclusion patterns."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -158,9 +156,7 @@ class TestMemoryOptimizedGenerator:
         assert len(files) == 0
 
     @pytest.mark.asyncio
-    async def test_analyze_files_batch(
-        self, sample_config, temp_project_dir, sample_modules
-    ):
+    async def test_analyze_files_batch(self, sample_config, temp_project_dir, sample_modules):
         """Test batch file analysis."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -172,9 +168,7 @@ class TestMemoryOptimizedGenerator:
         mock_optimizer.memory_efficient_file_reader.return_value = ["file content"]
 
         # Mock analyzer method
-        with patch.object(
-            generator.analyzer, "_analyze_file", return_value=sample_modules[0]
-        ):
+        with patch.object(generator.analyzer, "_analyze_file", return_value=sample_modules[0]):
             file_paths = [temp_project_dir / "src" / "sample_module.py"]
 
             modules = await generator._analyze_files_batch(file_paths, mock_optimizer)
@@ -183,9 +177,7 @@ class TestMemoryOptimizedGenerator:
             assert modules[0].name == "sample_module"
 
     @pytest.mark.asyncio
-    async def test_analyze_files_batch_with_error(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_analyze_files_batch_with_error(self, sample_config, temp_project_dir):
         """Test batch file analysis with file error."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -194,9 +186,7 @@ class TestMemoryOptimizedGenerator:
 
         # Mock memory optimizer
         mock_optimizer = Mock()
-        mock_optimizer.memory_efficient_file_reader.side_effect = Exception(
-            "File error"
-        )
+        mock_optimizer.memory_efficient_file_reader.side_effect = Exception("File error")
 
         file_paths = [temp_project_dir / "src" / "sample_module.py"]
 
@@ -205,9 +195,7 @@ class TestMemoryOptimizedGenerator:
 
         assert len(modules) == 0  # No modules due to error
 
-    def test_create_batch_structure(
-        self, sample_config, temp_project_dir, sample_modules
-    ):
+    def test_create_batch_structure(self, sample_config, temp_project_dir, sample_modules):
         """Test batch structure creation."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -246,9 +234,7 @@ class TestMemoryOptimizedGenerator:
             assert result == expected_obsidian
 
     @pytest.mark.asyncio
-    async def test_save_batch_to_vault_no_manager(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_save_batch_to_vault_no_manager(self, sample_config, temp_project_dir):
         """Test vault saving with no vault manager."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -262,9 +248,7 @@ class TestMemoryOptimizedGenerator:
         assert result == []  # Empty list when no vault manager
 
     @pytest.mark.asyncio
-    async def test_save_batch_to_vault_with_manager(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_save_batch_to_vault_with_manager(self, sample_config, temp_project_dir):
         """Test vault saving with mock vault manager."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -334,9 +318,7 @@ class TestMemoryOptimizedGenerator:
                 mock_monitor = Mock()
                 mock_monitor.current_profile = Mock()
                 mock_monitor.current_profile.memory_delta_mb = 10.0
-                mock_monitor.get_memory_recommendations.return_value = [
-                    "Test recommendation"
-                ]
+                mock_monitor.get_memory_recommendations.return_value = ["Test recommendation"]
 
                 # Mock profile_operation context manager
                 mock_profile_context = Mock()
@@ -380,9 +362,7 @@ class TestMemoryOptimizedGeneratorFullPipeline:
         # Mock all major dependencies
         with patch.object(generator, "_discover_files_efficiently") as mock_discover:
             with patch.object(generator, "_analyze_files_batch") as mock_analyze:
-                with patch.object(
-                    generator, "_generate_documentation_streaming"
-                ) as mock_generate:
+                with patch.object(generator, "_generate_documentation_streaming") as mock_generate:
                     mock_discover.return_value = [Path("test.py")]
                     mock_analyze.return_value = sample_modules
                     mock_generate.return_value = ["output.md"]
@@ -392,9 +372,7 @@ class TestMemoryOptimizedGeneratorFullPipeline:
                     mock_monitor.profile_operation.return_value.__enter__ = Mock(
                         return_value=Mock()
                     )
-                    mock_monitor.profile_operation.return_value.__exit__ = Mock(
-                        return_value=None
-                    )
+                    mock_monitor.profile_operation.return_value.__exit__ = Mock(return_value=None)
                     mock_monitor.take_snapshot.return_value = None
                     mock_monitor.get_memory_snapshot.return_value = Mock(
                         rss_mb=64.0, python_objects=1000
@@ -405,9 +383,7 @@ class TestMemoryOptimizedGeneratorFullPipeline:
                     mock_optimizer.batch_processor.return_value.__enter__ = Mock(
                         return_value=iter([[Path("test.py")]])
                     )
-                    mock_optimizer.batch_processor.return_value.__exit__ = Mock(
-                        return_value=None
-                    )
+                    mock_optimizer.batch_processor.return_value.__exit__ = Mock(return_value=None)
                     mock_optimizer.clear_caches.return_value = {}
 
                     with patch(
@@ -428,9 +404,7 @@ class TestMemoryOptimizedGeneratorFullPipeline:
                         assert "statistics" in result
 
     @pytest.mark.asyncio
-    async def test_generate_documentation_streaming_empty(
-        self, sample_config, temp_project_dir
-    ):
+    async def test_generate_documentation_streaming_empty(self, sample_config, temp_project_dir):
         """Test streaming generation with empty module list."""
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
@@ -439,9 +413,7 @@ class TestMemoryOptimizedGeneratorFullPipeline:
 
         # Mock optimizer for batch processing
         mock_optimizer = Mock()
-        mock_optimizer.batch_processor.return_value.__enter__ = Mock(
-            return_value=iter([])
-        )
+        mock_optimizer.batch_processor.return_value.__enter__ = Mock(return_value=iter([]))
         mock_optimizer.batch_processor.return_value.__exit__ = Mock(return_value=None)
 
         result = await generator._generate_documentation_streaming([], mock_optimizer)
@@ -466,9 +438,7 @@ class TestMemoryOptimizedGeneratorFullPipeline:
         mock_optimizer.batch_processor.return_value = mock_batch_context
 
         # Mock Sphinx generation to succeed
-        with patch.object(
-            generator.sphinx_generator, "generate_documentation"
-        ) as mock_sphinx:
+        with patch.object(generator.sphinx_generator, "generate_documentation") as mock_sphinx:
             with patch.object(generator, "_convert_batch_to_obsidian") as mock_convert:
                 with patch.object(generator, "_save_batch_to_vault") as mock_save:
                     mock_sphinx.return_value = {
@@ -506,9 +476,7 @@ class TestMemoryOptimizedGeneratorFullPipeline:
         mock_optimizer.batch_processor.return_value.__exit__ = Mock(return_value=None)
 
         # Mock Sphinx generation to raise an error
-        with patch.object(
-            generator.sphinx_generator, "generate_documentation"
-        ) as mock_sphinx:
+        with patch.object(generator.sphinx_generator, "generate_documentation") as mock_sphinx:
             mock_sphinx.side_effect = Exception("Sphinx error")
 
             # Should handle error gracefully and continue
@@ -538,10 +506,7 @@ class TestMemoryOptimizedGeneratorErrorHandling:
         config = sample_config
         config.project.source_paths = [str(temp_project_dir / "src")]
 
-        generators = [
-            MemoryOptimizedDocumentationGenerator(config, batch_size=5)
-            for _ in range(3)
-        ]
+        generators = [MemoryOptimizedDocumentationGenerator(config, batch_size=5) for _ in range(3)]
 
         for gen in generators:
             assert gen.analyzer is not None

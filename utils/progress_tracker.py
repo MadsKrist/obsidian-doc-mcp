@@ -187,20 +187,12 @@ class ProgressTracker:
                 progress.elapsed_time = time.time() - progress.start_time
 
             # Estimate remaining time based on current progress
-            if (
-                progress.total > 0
-                and progress.current > 0
-                and progress.elapsed_time > 0
-            ):
+            if progress.total > 0 and progress.current > 0 and progress.elapsed_time > 0:
                 rate = progress.current / progress.elapsed_time
                 remaining_items = progress.total - progress.current
-                progress.estimated_remaining = (
-                    remaining_items / rate if rate > 0 else None
-                )
+                progress.estimated_remaining = remaining_items / rate if rate > 0 else None
 
-            logger.debug(
-                f"Updated operation: {name} ({progress.current}/{progress.total})"
-            )
+            logger.debug(f"Updated operation: {name} ({progress.current}/{progress.total})")
             self._notify_callbacks(name, progress)
 
             return progress
@@ -285,9 +277,7 @@ class ProgressTracker:
         """
         with self._lock:
             return {
-                name: progress
-                for name, progress in self._operations.items()
-                if progress.is_running
+                name: progress for name, progress in self._operations.items() if progress.is_running
             }
 
     def get_operation_tree(self, root: str | None = None) -> dict[str, Any]:
@@ -307,15 +297,9 @@ class ProgressTracker:
             else:
                 # Get all top-level operations (no parent)
                 top_level = [
-                    name
-                    for name, progress in self._operations.items()
-                    if not progress.parent
+                    name for name, progress in self._operations.items() if not progress.parent
                 ]
-                return {
-                    "children": {
-                        name: self._build_tree_node(name) for name in top_level
-                    }
-                }
+                return {"children": {name: self._build_tree_node(name) for name in top_level}}
 
     def _build_tree_node(self, name: str) -> dict[str, Any]:
         """Build a tree node for an operation and its children."""
@@ -334,9 +318,7 @@ class ProgressTracker:
 
         return node
 
-    def add_update_callback(
-        self, callback: Callable[[str, ProgressInfo], None]
-    ) -> None:
+    def add_update_callback(self, callback: Callable[[str, ProgressInfo], None]) -> None:
         """Add a callback to be notified of progress updates.
 
         Args:
@@ -345,9 +327,7 @@ class ProgressTracker:
         with self._lock:
             self._update_callbacks.append(callback)
 
-    def remove_update_callback(
-        self, callback: Callable[[str, ProgressInfo], None]
-    ) -> None:
+    def remove_update_callback(self, callback: Callable[[str, ProgressInfo], None]) -> None:
         """Remove an update callback.
 
         Args:
@@ -373,9 +353,7 @@ class ProgressTracker:
         """
         with self._lock:
             to_remove = [
-                name
-                for name, progress in self._operations.items()
-                if progress.is_complete
+                name for name, progress in self._operations.items() if progress.is_complete
             ]
 
             for name in to_remove:
@@ -422,35 +400,19 @@ class ProgressTracker:
             total_ops = len(self._operations)
             running_ops = len(self.get_active_operations())
             completed_ops = len(
-                [
-                    p
-                    for p in self._operations.values()
-                    if p.status == ProgressStatus.COMPLETED
-                ]
+                [p for p in self._operations.values() if p.status == ProgressStatus.COMPLETED]
             )
             failed_ops = len(
-                [
-                    p
-                    for p in self._operations.values()
-                    if p.status == ProgressStatus.FAILED
-                ]
+                [p for p in self._operations.values() if p.status == ProgressStatus.FAILED]
             )
             cancelled_ops = len(
-                [
-                    p
-                    for p in self._operations.values()
-                    if p.status == ProgressStatus.CANCELLED
-                ]
+                [p for p in self._operations.values() if p.status == ProgressStatus.CANCELLED]
             )
 
             # Calculate overall progress for determinate operations
             total_items = sum(p.total for p in self._operations.values() if p.total > 0)
-            completed_items = sum(
-                p.current for p in self._operations.values() if p.total > 0
-            )
-            overall_progress = (
-                (completed_items / total_items * 100) if total_items > 0 else 0.0
-            )
+            completed_items = sum(p.current for p in self._operations.values() if p.total > 0)
+            overall_progress = (completed_items / total_items * 100) if total_items > 0 else 0.0
 
             return {
                 "total_operations": total_ops,
@@ -492,9 +454,7 @@ def track_progress(
         yield progress
         tracker.complete_operation(name, ProgressStatus.COMPLETED)
     except Exception as e:
-        tracker.complete_operation(
-            name, ProgressStatus.FAILED, f"Operation failed: {str(e)}"
-        )
+        tracker.complete_operation(name, ProgressStatus.FAILED, f"Operation failed: {str(e)}")
         raise
 
 
@@ -596,9 +556,7 @@ class ProgressFormatter:
             return f"Elapsed: {elapsed}"
 
     @staticmethod
-    def format_operation_status(
-        progress: ProgressInfo, include_bar: bool = True
-    ) -> str:
+    def format_operation_status(progress: ProgressInfo, include_bar: bool = True) -> str:
         """Format complete operation status.
 
         Args:

@@ -50,9 +50,7 @@ class SphinxProject:
             Generated conf.py content as string
         """
         project_name = self.project_structure.project_name
-        version = (
-            "1.0.0"  # Default version, could be extracted from setup.py/pyproject.toml
-        )
+        version = "1.0.0"  # Default version, could be extracted from setup.py/pyproject.toml
 
         # Base configuration
         conf_content = f'''"""Configuration file for Sphinx documentation."""
@@ -413,9 +411,7 @@ Submodules
                 "sphinx-build command not found. Please install Sphinx."
             ) from e
         except Exception as e:
-            raise SphinxGenerationError(
-                f"Unexpected error during Sphinx build: {e}"
-            ) from e
+            raise SphinxGenerationError(f"Unexpected error during Sphinx build: {e}") from e
 
 
 class SphinxDocumentationGenerator:
@@ -429,9 +425,7 @@ class SphinxDocumentationGenerator:
         """
         self.config = config
 
-    def generate_documentation(
-        self, project_structure: ProjectStructure
-    ) -> dict[str, Any]:
+    def generate_documentation(self, project_structure: ProjectStructure) -> dict[str, Any]:
         """Generate complete Sphinx documentation for a project.
 
         Args:

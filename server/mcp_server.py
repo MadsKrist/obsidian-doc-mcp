@@ -130,9 +130,7 @@ class DocumentationMCPServer:
             ]
 
         @self.server.call_tool()
-        async def handle_call_tool(
-            name: str, arguments: dict[str, Any]
-        ) -> list[TextContent]:
+        async def handle_call_tool(name: str, arguments: dict[str, Any]) -> list[TextContent]:
             """Handle tool calls."""
             logger.info(f"Tool called: {name} with args: {arguments}")
 
@@ -169,9 +167,7 @@ class DocumentationMCPServer:
                     "error_type": type(e).__name__,
                     "tool": name,
                 }
-                return [
-                    TextContent(type="text", text=json.dumps(error_result, indent=2))
-                ]
+                return [TextContent(type="text", text=json.dumps(error_result, indent=2))]
 
     def _register_resource_handlers(self) -> None:
         """Register MCP resource handlers."""
@@ -203,8 +199,7 @@ class DocumentationMCPServer:
                 Resource(
                     uri=AnyUrl("mcp://server/status"),
                     name="Server Status",
-                    description="Current status and health information of "
-                    "the MCP server",
+                    description="Current status and health information of the MCP server",
                     mimeType="application/json",
                 ),
                 Resource(
@@ -247,9 +242,7 @@ class DocumentationMCPServer:
                 }
                 return json.dumps(error_result, indent=2)
 
-    async def _handle_analyze_project(
-        self, arguments: dict[str, Any]
-    ) -> list[TextContent]:
+    async def _handle_analyze_project(self, arguments: dict[str, Any]) -> list[TextContent]:
         """Handle project analysis tool call."""
         try:
             project_path = Path(arguments["project_path"])
@@ -330,9 +323,7 @@ class DocumentationMCPServer:
             logger.exception("Error analyzing project")
             return [TextContent(type="text", text=f"Error analyzing project: {str(e)}")]
 
-    async def _handle_health_check(
-        self, _arguments: dict[str, Any]
-    ) -> list[TextContent]:
+    async def _handle_health_check(self, _arguments: dict[str, Any]) -> list[TextContent]:
         """Handle health check tool call."""
         try:
             status = {
