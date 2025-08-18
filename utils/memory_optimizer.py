@@ -100,15 +100,19 @@ class MemoryMonitor:
             )
         else:
             # Fallback when psutil is not available
-            import resource
+            try:
+                import resource
 
-            rusage = resource.getrusage(resource.RUSAGE_SELF)
-            # Note: rusage.ru_maxrss is in KB on Linux, bytes on macOS
-            rss_mb = (
-                rusage.ru_maxrss / 1024
-                if sys.platform != "darwin"
-                else rusage.ru_maxrss / 1024 / 1024
-            )
+                rusage = resource.getrusage(resource.RUSAGE_SELF)
+                # Note: rusage.ru_maxrss is in KB on Linux, bytes on macOS
+                rss_mb = (
+                    rusage.ru_maxrss / 1024
+                    if sys.platform != "darwin"
+                    else rusage.ru_maxrss / 1024 / 1024
+                )
+            except (ImportError, AttributeError):
+                # resource module not available on Windows or limited functionality
+                rss_mb = 0.0
 
             snapshot = MemorySnapshot(
                 timestamp=time.time(),
@@ -120,7 +124,7 @@ class MemoryMonitor:
             )
 
         if self.enable_tracemalloc and tracemalloc.is_tracing():
-            current, peak = tracemalloc.get_traced_memory()
+            current, _ = tracemalloc.get_traced_memory()
             snapshot.tracemalloc_mb = current / 1024 / 1024
 
         return snapshot

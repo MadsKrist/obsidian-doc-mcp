@@ -122,7 +122,7 @@ class ObsidianVaultManager:
         try:
             with open(temp_path, "w", encoding="utf-8") as f:
                 f.write(content)
-            temp_path.rename(file_path)
+            temp_path.replace(file_path)
         except Exception:
             # Clean up temp file if write failed
             if temp_path.exists():

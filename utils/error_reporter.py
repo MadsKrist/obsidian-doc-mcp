@@ -89,7 +89,7 @@ class DetailedError:
                 }
                 for s in self.suggestions
             ],
-            "affected_files": [str(f) for f in self.affected_files],
+            "affected_files": [str(f).replace("\\", "/") for f in self.affected_files],
             "has_stack_trace": self.stack_trace is not None,
         }
 
