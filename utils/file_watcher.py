@@ -162,6 +162,7 @@ class FileWatcher:
         self.event_handler: PythonFileEventHandler | None = None
         self.is_watching = False
         self.update_callbacks: list[Callable[[set[Path]], None]] = []
+        self._background_tasks: set[asyncio.Task] = set()  # Track background tasks
 
     def add_update_callback(self, callback: Callable[[set[Path]], None]) -> None:
         """Add a callback to be called when files change.
@@ -230,6 +231,12 @@ class FileWatcher:
         if self.event_handler and self.event_handler.debounce_timer:
             self.event_handler.debounce_timer.cancel()
 
+        # Cancel any pending background tasks
+        for task in self._background_tasks:
+            if not task.done():
+                task.cancel()
+        self._background_tasks.clear()
+
         self.event_handler = None
         self.is_watching = False
         logger.info("File watcher stopped")
@@ -252,8 +259,10 @@ class FileWatcher:
                 # Try to get current event loop
                 loop = asyncio.get_event_loop()
                 if loop.is_running():
-                    # Schedule coroutine on existing loop
-                    asyncio.create_task(self._async_incremental_update(changed_files))
+                    # Schedule coroutine on existing loop with proper task tracking
+                    task = asyncio.create_task(self._async_incremental_update(changed_files))
+                    self._background_tasks.add(task)
+                    task.add_done_callback(self._background_tasks.discard)
                 else:
                     # No loop running, run in thread
                     threading.Thread(
